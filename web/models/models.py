@@ -27,27 +27,36 @@ class ClientContractInfo:
     def __del__(self):
         self.r.close()
 
+    def is_exist(self) -> bool:
+        if self.r.exists(self.client_key) == 1:
+            return True
+        return False
+
     def insert(self, client_description: str) -> bool:
         """
         插入该委托人信息
         :param client_description: 委托人描述
-        :return: 成功返回True，否则返回False
+        :return: 成功插入返回True，否则返回False
         """
         data = [self.client_id, client_description]
         return self.r.setnx(self.client_key, json.dumps(data))
 
-    def delete(self) -> int:
+    def delete(self) -> bool:
         """
         删除该委托人信息
-        :return: 成功删除的数量(成功删除为1，未成功为0)
+        :return: 成功删除返回True，否则返回False
         """
-        return self.r.delete(self.client_key)
+        if self.r.delete(self.client_key) == 1:
+            return True
+        return False
 
     def get(self) -> List:
         """
         获取该委托人信息
         :return: [委托方ID, 委托人描述]
         """
+        if not self.is_exist():
+            return []
         return json.loads(self.r.get(self.client_key))
 
 
@@ -69,6 +78,11 @@ class ProjectInfo:
     def __del__(self):
         self.r.close()
 
+    def is_exist(self) -> bool:
+        if self.r.exists(self.project_key) == 1:
+            return True
+        return False
+
     def insert(
         self,
         client_id: int,
@@ -88,7 +102,7 @@ class ProjectInfo:
         :param project_creation_time: 项目创建时间
         :param project_description: 项目描述
         :param project_manager: 项目负责人
-        :return: 成功返回 True，否则返回 False
+        :return: 成功插入返回 True，否则返回 False
         """
         data = [
             self.project_id,
@@ -102,18 +116,22 @@ class ProjectInfo:
         ]
         return self.r.setnx(self.project_key, json.dumps(data))
 
-    def delete(self) -> int:
+    def delete(self) -> bool:
         """
         删除该委托人信息
-        :return: 成功删除的数量(成功删除为1，未成功为0)
+        :return: 成功删除返回True，否则返回False
         """
-        return self.r.delete(self.project_key)
+        if self.r.delete(self.project_key) == 1:
+            return True
+        return False
 
     def get(self) -> List:
         """
         获取该委托人信息
         :return: [项目 ID, 委托方 ID, 检查体系 ID, 项目状态, 项目风险值, 项目创建时间, 项目描述, 项目负责人]
         """
+        if not self.is_exist():
+            return []
         return json.loads(self.r.get(self.project_key))
 
 
@@ -134,6 +152,11 @@ class CheckInfo:
 
     def __del__(self):
         self.r.close()
+
+    def is_exist(self) -> bool:
+        if self.r.exists(self.check_key) == 1:
+            return True
+        return False
 
     def insert(
         self,
@@ -165,29 +188,68 @@ class CheckInfo:
     def delete(self) -> int:
         """
         删除该检查信息
-        :return: 成功删除的数量(成功删除为1，未成功为0)
+        :return: 成功返回 True，否则返回 False
         """
-        return self.r.delete(self.check_key)
+        if self.r.delete(self.check_key) == 1:
+            return True
+        return False
 
     def get(self) -> List:
         """
         获取该检查信息
         :return: [检查ID, 项目ID, 检查体系第一级ID, 第二级ID, 问题描述]
         """
+        if not self.is_exist():
+            return []
         return json.loads(self.r.get(self.check_key))
 
 
-class CheckSystem:
+class CheckSystemInfo:
     """
     检查体系表：当前结点ID、前置结点ID（第一级改字段为0）等
     """
 
-    def __init__(self):
-        self.table_name = "CheckSystem"  # 表名
+    def __init__(self, check_system_id):
+        self.table_name = "CheckSystemInfo"  # 表名
+        self.check_system_id = check_system_id
+        self.check_system_key = id_to_key(self.table_name, check_system_id)
         self.r = redis.Redis(connection_pool=database.pool)
 
     def __del__(self):
         self.r.close()
+
+    def is_exist(self) -> bool:
+        if self.r.exists(self.check_system_key) == 1:
+            return True
+        return False
+
+    def insert(self, front_id, check_system_describe):
+        """
+        插入该检查体系信息
+        :param front_id: 前置检查体系ID
+        :param check_system_describe: 检查体系描述
+        :return:
+        """
+        data = [self.check_system_id, front_id, check_system_describe]
+        return self.r.setnx(self.check_system_key, json.dumps(data))
+
+    def delete(self):
+        """
+        删除该检查体系信息
+        :return: 成功返回 True，否则返回 False
+        """
+        if self.r.delete(self.check_system_key) == 1:
+            return True
+        return False
+
+    def get(self):
+        """
+        得到该检查体系信息
+        :return: [当前结点ID, 前置结点ID, 节点描述]
+        """
+        if not self.is_exist():
+            return []
+        return json.loads(self.r.get(self.check_system_key))
 
 
 class EmployeeInfo:
@@ -208,6 +270,11 @@ class EmployeeInfo:
     def __del__(self):
         self.r.close()
 
+    def is_exist(self) -> bool:
+        if self.r.exists(self.employee_key) == 1:
+            return True
+        return False
+
     def insert(self, employee_name: str, employee_age: int) -> bool:
         """
         插入该员工信息
@@ -220,21 +287,26 @@ class EmployeeInfo:
             self.employee_key, "data", json.dumps(data)
         ) and self.r.hsetnx(self.employee_key, "groups", json.dumps([]))
 
-    def delete(self) -> int:
+    def delete(self) -> bool:
         """
         删除该员工信息
-        :return: 成功删除的数量(成功删除为1，未成功为0)
+        :return: 成功返回 True，否则返回 False
         """
-        return self.r.delete(self.employee_key)
+        if self.r.delete(self.employee_key) == 1:
+            return True
+        return False
+
+    def update(self) -> bool:
+        pass
 
     def get_data(self) -> List:
         """
         获取该员工信息
         :return: [员工ID, 员工姓名, 员工年龄]
         """
-        data = self.r.hget(self.employee_key, "data")
-        if not data:
+        if not self.is_exist():
             return []
+        data = self.r.hget(self.employee_key, "data")
         return json.loads(data)
 
     def get_groups(self) -> List:
@@ -242,6 +314,8 @@ class EmployeeInfo:
         获取该员工所在小组
         :return: 包含小组ID的列表
         """
+        if not self.is_exist():
+            return []
         return json.loads(self.r.hget(self.employee_key, "groups"))
 
     def join_group(self, group_id: int) -> bool:
@@ -250,6 +324,8 @@ class EmployeeInfo:
         :param group_id: 小组ID
         :return: 是否加入成功
         """
+        if not self.is_exist():
+            return False
         groups = self.get_groups()
         if group_id in groups:
             return False
@@ -263,6 +339,8 @@ class EmployeeInfo:
         :param group_id: 小组ID
         :return: 是否退出成功
         """
+        if not self.is_exist():
+            return False
         groups = self.get_groups()
         if group_id in groups:
             groups.remove(group_id)
@@ -288,19 +366,19 @@ class GroupInfo:
     def __del__(self):
         self.r.close()
 
-    def generate_group(self):
-        """
-        生成小组，如果没有这个Key就初始化组长数量
-        :return: 已经存在返回False，否则返回True
-        """
-        return self.r.hsetnx(self.group_key, "leader_num", 0)
+    def is_exist(self) -> bool:
+        if self.r.exists(self.group_key) == 1:
+            return True
+        return False
 
     def delete_group(self) -> int:
         """
         删除小组
-        :return: 成功删除的数量(成功删除为1，未成功为0)
+        :return: 成功返回 True，否则返回 False
         """
-        return self.r.delete(self.group_key)
+        if self.r.delete(self.group_key) == 1:
+            return True
+        return False
 
     def add_employee(self, employee_id: int, is_leader: bool) -> bool:
         """
@@ -310,8 +388,9 @@ class GroupInfo:
         :return: 成功插入信息返回True，否则返回False
         """
         data = {"is_leader": is_leader}
+        # 如果是第一个员工加入则初始化leader_num为0
+        self.r.hsetnx(self.group_key, "leader_num", 0)
 
-        self.generate_group()
         if is_leader:
             self.update_leader_num(1)
 
@@ -376,11 +455,12 @@ class GroupInfo:
 
 if __name__ == "__main__":
     tmp = EmployeeInfo(1)
-    print(tmp.get_data())
-    print(tmp.insert("wws", 18))
-    print(tmp.get_data())
-    print(tmp.get_groups())
-    print(tmp.join_group(1))
-    print(tmp.get_groups())
-    print(tmp.delete())
+    # print(tmp.get_data())
+    # print(tmp.insert("wws", 18))
+    # print(tmp.get_data())
+    # print(tmp.get_groups())
+    # print(tmp.join_group(1))
+    # print(tmp.get_groups())
+    # print(tmp.delete())
     print(tmp.r.keys())
+    # print(tmp.is_exist())
