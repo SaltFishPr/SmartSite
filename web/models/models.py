@@ -19,16 +19,16 @@ class ClientContractInfo:
         初始化该委托方
         :param client_id: 委托方ID
         """
-        self.table_name = "ClientContractInfo"  # 表名
-        self.client_id = client_id
-        self.client_key = id_to_key(self.table_name, client_id)
-        self.r = redis.Redis(connection_pool=database.pool)
+        self.__table_name = "ClientContractInfo"  # 表名
+        self.__client_id = client_id
+        self.__client_key = id_to_key(self.__table_name, client_id)
+        self.__r = redis.Redis(connection_pool=database.pool)
 
     def __del__(self):
-        self.r.close()
+        self.__r.close()
 
     def is_exist(self) -> bool:
-        if self.r.exists(self.client_key) == 1:
+        if self.__r.exists(self.__client_key) == 1:
             return True
         return False
 
@@ -38,15 +38,15 @@ class ClientContractInfo:
         :param client_description: 委托人描述
         :return: 成功插入返回True，否则返回False
         """
-        data = [self.client_id, client_description]
-        return self.r.setnx(self.client_key, json.dumps(data))
+        data = [self.__client_id, client_description]
+        return self.__r.setnx(self.__client_key, json.dumps(data))
 
     def delete(self) -> bool:
         """
         删除该委托人信息
         :return: 成功删除返回True，否则返回False
         """
-        if self.r.delete(self.client_key) == 1:
+        if self.__r.delete(self.__client_key) == 1:
             return True
         return False
 
@@ -57,7 +57,7 @@ class ClientContractInfo:
         """
         if not self.is_exist():
             return []
-        return json.loads(self.r.get(self.client_key))
+        return json.loads(self.__r.get(self.__client_key))
 
 
 class ProjectInfo:
@@ -70,16 +70,16 @@ class ProjectInfo:
         初始化该项目信息
         :param project_id: 项目ID
         """
-        self.table_name = "ProjectInfo"  # 表名
-        self.project_id = project_id
-        self.project_key = id_to_key(self.table_name, project_id)
-        self.r = redis.Redis(connection_pool=database.pool)
+        self.__table_name = "ProjectInfo"  # 表名
+        self.__project_id = project_id
+        self.__project_key = id_to_key(self.__table_name, project_id)
+        self.__r = redis.Redis(connection_pool=database.pool)
 
     def __del__(self):
-        self.r.close()
+        self.__r.close()
 
     def is_exist(self) -> bool:
-        if self.r.exists(self.project_key) == 1:
+        if self.__r.exists(self.__project_key) == 1:
             return True
         return False
 
@@ -105,7 +105,7 @@ class ProjectInfo:
         :return: 成功插入返回 True，否则返回 False
         """
         data = [
-            self.project_id,
+            self.__project_id,
             client_id,
             check_system_id,
             project_status,
@@ -114,14 +114,14 @@ class ProjectInfo:
             project_description,
             project_manager,
         ]
-        return self.r.setnx(self.project_key, json.dumps(data))
+        return self.__r.setnx(self.__project_key, json.dumps(data))
 
     def delete(self) -> bool:
         """
         删除该委托人信息
         :return: 成功删除返回True，否则返回False
         """
-        if self.r.delete(self.project_key) == 1:
+        if self.__r.delete(self.__project_key) == 1:
             return True
         return False
 
@@ -132,7 +132,7 @@ class ProjectInfo:
         """
         if not self.is_exist():
             return []
-        return json.loads(self.r.get(self.project_key))
+        return json.loads(self.__r.get(self.__project_key))
 
 
 class CheckInfo:
@@ -145,16 +145,16 @@ class CheckInfo:
         初始化该检查条目
         :param check_id: 检查条目ID
         """
-        self.table_name = "CheckInfo"  # 表名
-        self.check_id = check_id
-        self.check_key = id_to_key(self.table_name, check_id)
-        self.r = redis.Redis(connection_pool=database.pool)
+        self.__table_name = "CheckInfo"  # 表名
+        self.__check_id = check_id
+        self.__check_key = id_to_key(self.__table_name, check_id)
+        self.__r = redis.Redis(connection_pool=database.pool)
 
     def __del__(self):
-        self.r.close()
+        self.__r.close()
 
     def is_exist(self) -> bool:
-        if self.r.exists(self.check_key) == 1:
+        if self.__r.exists(self.__check_key) == 1:
             return True
         return False
 
@@ -176,21 +176,21 @@ class CheckInfo:
         :return: 成功返回 True，否则返回 False
         """
         data = [
-            self.check_id,
+            self.__check_id,
             project_id,
             check_system_lv_1,
             check_system_lv_2,
             employee_id,
             problem_description,
         ]
-        return self.r.setnx(self.check_key, json.dumps(data))
+        return self.__r.setnx(self.__check_key, json.dumps(data))
 
     def delete(self) -> int:
         """
         删除该检查信息
         :return: 成功返回 True，否则返回 False
         """
-        if self.r.delete(self.check_key) == 1:
+        if self.__r.delete(self.__check_key) == 1:
             return True
         return False
 
@@ -201,7 +201,7 @@ class CheckInfo:
         """
         if not self.is_exist():
             return []
-        return json.loads(self.r.get(self.check_key))
+        return json.loads(self.__r.get(self.__check_key))
 
 
 class CheckSystemInfo:
@@ -210,16 +210,16 @@ class CheckSystemInfo:
     """
 
     def __init__(self, check_system_id):
-        self.table_name = "CheckSystemInfo"  # 表名
-        self.check_system_id = check_system_id
-        self.check_system_key = id_to_key(self.table_name, check_system_id)
-        self.r = redis.Redis(connection_pool=database.pool)
+        self.__table_name = "CheckSystemInfo"  # 表名
+        self.__check_system_id = check_system_id
+        self.__check_system_key = id_to_key(self.__table_name, check_system_id)
+        self.__r = redis.Redis(connection_pool=database.pool)
 
     def __del__(self):
-        self.r.close()
+        self.__r.close()
 
     def is_exist(self) -> bool:
-        if self.r.exists(self.check_system_key) == 1:
+        if self.__r.exists(self.__check_system_key) == 1:
             return True
         return False
 
@@ -230,15 +230,15 @@ class CheckSystemInfo:
         :param check_system_describe: 检查体系描述
         :return:
         """
-        data = [self.check_system_id, front_id, check_system_describe]
-        return self.r.setnx(self.check_system_key, json.dumps(data))
+        data = [self.__check_system_id, front_id, check_system_describe]
+        return self.__r.setnx(self.__check_system_key, json.dumps(data))
 
     def delete(self):
         """
         删除该检查体系信息
         :return: 成功返回 True，否则返回 False
         """
-        if self.r.delete(self.check_system_key) == 1:
+        if self.__r.delete(self.__check_system_key) == 1:
             return True
         return False
 
@@ -249,7 +249,7 @@ class CheckSystemInfo:
         """
         if not self.is_exist():
             return []
-        return json.loads(self.r.get(self.check_system_key))
+        return json.loads(self.__r.get(self.__check_system_key))
 
 
 class EmployeeInfo:
@@ -262,16 +262,16 @@ class EmployeeInfo:
         初始化该员工信息
         :param employee_id: 员工ID
         """
-        self.table_name = "EmployeeInfo"  # 表名
-        self.employee_id = employee_id
-        self.employee_key = id_to_key(self.table_name, employee_id)
-        self.r = redis.Redis(connection_pool=database.pool)
+        self.__table_name = "EmployeeInfo"  # 表名
+        self.__employee_id = employee_id
+        self.__employee_key = id_to_key(self.__table_name, employee_id)
+        self.__r = redis.Redis(connection_pool=database.pool)
 
     def __del__(self):
-        self.r.close()
+        self.__r.close()
 
     def is_exist(self) -> bool:
-        if self.r.exists(self.employee_key) == 1:
+        if self.__r.exists(self.__employee_key) == 1:
             return True
         return False
 
@@ -282,17 +282,17 @@ class EmployeeInfo:
         :param employee_age: 员工年龄
         :return: 成功返回 True，否则返回 False
         """
-        data = [self.employee_id, employee_name, employee_age]
-        return self.r.hsetnx(
-            self.employee_key, "data", json.dumps(data)
-        ) and self.r.hsetnx(self.employee_key, "groups", json.dumps([]))
+        data = [self.__employee_id, employee_name, employee_age]
+        return self.__r.hsetnx(
+            self.__employee_key, "data", json.dumps(data)
+        ) and self.__r.hsetnx(self.__employee_key, "groups", json.dumps([]))
 
     def delete(self) -> bool:
         """
         删除该员工信息
         :return: 成功返回 True，否则返回 False
         """
-        if self.r.delete(self.employee_key) == 1:
+        if self.__r.delete(self.__employee_key) == 1:
             return True
         return False
 
@@ -306,7 +306,7 @@ class EmployeeInfo:
         """
         if not self.is_exist():
             return []
-        data = self.r.hget(self.employee_key, "data")
+        data = self.__r.hget(self.__employee_key, "data")
         return json.loads(data)
 
     def get_groups(self) -> List:
@@ -316,36 +316,10 @@ class EmployeeInfo:
         """
         if not self.is_exist():
             return []
-        return json.loads(self.r.hget(self.employee_key, "groups"))
+        return json.loads(self.__r.hget(self.__employee_key, "groups"))
 
-    def join_group(self, group_id: int) -> bool:
-        """
-        员工加入小组
-        :param group_id: 小组ID
-        :return: 是否加入成功
-        """
-        if not self.is_exist():
-            return False
-        groups = self.get_groups()
-        if group_id in groups:
-            return False
-        groups.append(group_id)
-        self.r.hset(self.employee_key, "groups", json.dumps(groups))
-        return True
-
-    def leave_group(self, group_id: int) -> bool:
-        """
-        员工退出小组
-        :param group_id: 小组ID
-        :return: 是否退出成功
-        """
-        if not self.is_exist():
-            return False
-        groups = self.get_groups()
-        if group_id in groups:
-            groups.remove(group_id)
-            return True
-        return False
+    def update_groups(self, groups: List):
+        self.__r.hset(self.__employee_key, "groups", json.dumps(groups))
 
 
 class GroupInfo:
@@ -358,16 +332,16 @@ class GroupInfo:
         初始化小组信息
         :param group_id: 小组ID
         """
-        self.table_name = "GroupInfo"  # 表名
-        self.group_id = group_id
-        self.group_key = id_to_key(self.table_name, group_id)
-        self.r = redis.Redis(connection_pool=database.pool)
+        self.__table_name = "GroupInfo"  # 表名
+        self.__group_id = group_id
+        self.__group_key = id_to_key(self.__table_name, group_id)
+        self.__r = redis.Redis(connection_pool=database.pool)
 
     def __del__(self):
-        self.r.close()
+        self.__r.close()
 
     def is_exist(self) -> bool:
-        if self.r.exists(self.group_key) == 1:
+        if self.__r.exists(self.__group_key) == 1:
             return True
         return False
 
@@ -376,7 +350,7 @@ class GroupInfo:
         删除小组
         :return: 成功返回 True，否则返回 False
         """
-        if self.r.delete(self.group_key) == 1:
+        if self.__r.delete(self.__group_key) == 1:
             return True
         return False
 
@@ -389,19 +363,18 @@ class GroupInfo:
         """
         data = {"is_leader": is_leader}
         # 如果是第一个员工加入则初始化leader_num为0
-        self.r.hsetnx(self.group_key, "leader_num", 0)
-
-        if is_leader:
-            self.update_leader_num(1)
+        self.__r.hsetnx(self.__group_key, "leader_num", 0)
 
         employee_info = EmployeeInfo(employee_id)
-        if employee_info.join_group(self.group_id) and self.r.hsetnx(
-            self.group_key, employee_id, json.dumps(data)
-        ):
+        joined_groups = employee_info.get_groups()
+
+        if self.__r.hsetnx(self.__group_key, employee_id, json.dumps(data)):
+            if is_leader:
+                self.update_leader_num(1)
+            joined_groups.append(self.__group_id)
+            employee_info.update_groups(joined_groups)
             return True
-        else:
-            employee_info.leave_group(self.group_id)
-            return False
+        return False
 
     def remove_employee(self, employee_id):
         """
@@ -411,17 +384,15 @@ class GroupInfo:
         """
         employee = self.get_employee(employee_id)
 
-        if employee["is_leader"]:
-            self.update_leader_num(-1)
-
         employee_info = EmployeeInfo(employee_id)
-        if employee_info.leave_group(self.group_id) and self.r.hdel(
-            self.group_key, employee_id
-        ):
+        joined_groups = employee_info.get_groups()
+        if self.__r.hdel(self.__group_key, employee_id):
+            if employee["is_leader"]:
+                self.update_leader_num(-1)
+            joined_groups.remove(employee_id)
+            employee_info.update_groups(joined_groups)
             return True
-        else:
-            employee_info.join_group(self.group_id)
-            return False
+        return False
 
     def get_employee(self, employee_id) -> dict:
         """
@@ -429,7 +400,9 @@ class GroupInfo:
         :param employee_id: 员工ID
         :return: {"is_leader": True/False}
         """
-        return json.loads(self.r.hget(self.group_key, employee_id))
+        if self.__r.hexists(self.__group_key, employee_id):
+            return json.loads(self.__r.hget(self.__group_key, employee_id))
+        return {}
 
     def get_all(self) -> List:
         """
@@ -437,8 +410,10 @@ class GroupInfo:
         :return: 一个包含该组所有员工的员工ID的List
         """
         res = []
-        data = self.r.hgetall(self.group_key)
+        data = self.__r.hgetall(self.__group_key)
         for k, v in data.items():
+            if k == "leader_num":
+                continue
             res.append([int(k), json.loads(v)["is_leader"]])
         return res
 
@@ -448,19 +423,6 @@ class GroupInfo:
         :param a:
         :return:
         """
-        leader_num = int(self.r.hget(self.group_key, "leader_num"))
+        leader_num = int(self.__r.hget(self.__group_key, "leader_num"))
         leader_num += a
-        self.r.hset(self.group_key, "leader_num", leader_num)
-
-
-if __name__ == "__main__":
-    tmp = EmployeeInfo(1)
-    # print(tmp.get_data())
-    # print(tmp.insert("wws", 18))
-    # print(tmp.get_data())
-    # print(tmp.get_groups())
-    # print(tmp.join_group(1))
-    # print(tmp.get_groups())
-    # print(tmp.delete())
-    print(tmp.r.keys())
-    # print(tmp.is_exist())
+        self.__r.hset(self.__group_key, "leader_num", leader_num)
