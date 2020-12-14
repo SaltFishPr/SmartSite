@@ -10,8 +10,3 @@ def id_to_key(table_name: str, iid: int) -> str:
 
 def key_to_id(key: str) -> int:
     return int(key.split(":")[-1])
-
-
-if __name__ == "__main__":
-    print(id_to_key("client", 1))
-    print(key_to_id("client:1"))

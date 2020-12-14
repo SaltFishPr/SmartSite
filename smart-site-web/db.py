@@ -1,12 +1,67 @@
 # !/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# @file: models.py
+# @file: db.py
 # @date: 2020/12/2
-import redis
 import json
 from typing import List
-from conf import database
-from utils.db import id_to_key
+
+import redis
+
+from utils import id_to_key
+
+pool = redis.ConnectionPool(host="localhost", port=6379, decode_responses=True)
+
+
+class AdministratorInfo:
+    """
+    管理员信息表：管理员用户名，密码，管理员描述
+    """
+
+    def __init__(self, administrator_username):
+        """
+        初始化管理员信息表
+        :param administrator_username: 管理员用户名
+        """
+        self.__table_name = "ClientContractInfo"  # 表名
+        self.__administrator_username = administrator_username
+        self.__administrator_key = f"{self.__table_name}:{administrator_username}"
+        self.__r = redis.Redis(connection_pool=pool)
+
+    def __del__(self):
+        self.__r.close()
+
+    def is_exist(self) -> bool:
+        if self.__r.exists(self.__administrator_key) == 1:
+            return True
+        return False
+
+    def insert(self, password: str, identity: str) -> bool:
+        """
+        插入管理员信息
+        :param password:
+        :param identity:
+        :return: 成功插入返回True，否则返回False
+        """
+        data = [self.__administrator_username, password, identity]
+        return self.__r.setnx(self.__administrator_key, json.dumps(data))
+
+    def delete(self) -> bool:
+        """
+        删除管理员信息
+        :return: 成功删除返回True，否则返回False
+        """
+        if self.__r.delete(self.__administrator_key) == 1:
+            return True
+        return False
+
+    def get(self) -> List:
+        """
+        获取该管理员信息
+        :return: [username, password, 描述]
+        """
+        if not self.is_exist():
+            return []
+        return json.loads(self.__r.get(self.__administrator_key))
 
 
 class ClientContractInfo:
@@ -16,13 +71,13 @@ class ClientContractInfo:
 
     def __init__(self, client_id):
         """
-        初始化该委托方
+        初始化该委托合同
         :param client_id: 委托方ID
         """
         self.__table_name = "ClientContractInfo"  # 表名
         self.__client_id = client_id
         self.__client_key = id_to_key(self.__table_name, client_id)
-        self.__r = redis.Redis(connection_pool=database.pool)
+        self.__r = redis.Redis(connection_pool=pool)
 
     def __del__(self):
         self.__r.close()
@@ -34,7 +89,7 @@ class ClientContractInfo:
 
     def insert(self, client_description: str) -> bool:
         """
-        插入该委托人信息
+        插入该委托合同信息
         :param client_description: 委托人描述
         :return: 成功插入返回True，否则返回False
         """
@@ -43,7 +98,7 @@ class ClientContractInfo:
 
     def delete(self) -> bool:
         """
-        删除该委托人信息
+        删除该委托合同信息
         :return: 成功删除返回True，否则返回False
         """
         if self.__r.delete(self.__client_key) == 1:
@@ -73,7 +128,7 @@ class ProjectInfo:
         self.__table_name = "ProjectInfo"  # 表名
         self.__project_id = project_id
         self.__project_key = id_to_key(self.__table_name, project_id)
-        self.__r = redis.Redis(connection_pool=database.pool)
+        self.__r = redis.Redis(connection_pool=pool)
 
     def __del__(self):
         self.__r.close()
@@ -148,7 +203,7 @@ class CheckInfo:
         self.__table_name = "CheckInfo"  # 表名
         self.__check_id = check_id
         self.__check_key = id_to_key(self.__table_name, check_id)
-        self.__r = redis.Redis(connection_pool=database.pool)
+        self.__r = redis.Redis(connection_pool=pool)
 
     def __del__(self):
         self.__r.close()
@@ -213,7 +268,7 @@ class CheckSystemInfo:
         self.__table_name = "CheckSystemInfo"  # 表名
         self.__check_system_id = check_system_id
         self.__check_system_key = id_to_key(self.__table_name, check_system_id)
-        self.__r = redis.Redis(connection_pool=database.pool)
+        self.__r = redis.Redis(connection_pool=pool)
 
     def __del__(self):
         self.__r.close()
@@ -265,7 +320,7 @@ class EmployeeInfo:
         self.__table_name = "EmployeeInfo"  # 表名
         self.__employee_id = employee_id
         self.__employee_key = id_to_key(self.__table_name, employee_id)
-        self.__r = redis.Redis(connection_pool=database.pool)
+        self.__r = redis.Redis(connection_pool=pool)
 
     def __del__(self):
         self.__r.close()
@@ -335,7 +390,7 @@ class GroupInfo:
         self.__table_name = "GroupInfo"  # 表名
         self.__group_id = group_id
         self.__group_key = id_to_key(self.__table_name, group_id)
-        self.__r = redis.Redis(connection_pool=database.pool)
+        self.__r = redis.Redis(connection_pool=pool)
 
     def __del__(self):
         self.__r.close()
@@ -418,11 +473,7 @@ class GroupInfo:
         return res
 
     def update_leader_num(self, a):
-        """
-        更新组长数量
-        :param a:
-        :return:
-        """
+        """更新组长数量"""
         leader_num = int(self.__r.hget(self.__group_key, "leader_num"))
         leader_num += a
         self.__r.hset(self.__group_key, "leader_num", leader_num)
