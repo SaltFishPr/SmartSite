@@ -1,8 +1,7 @@
 # !/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# @author: saltfish
 # @file: __init__.py.py
-# @date: 2020/05/20
+# @date: 2020/12/13
 from flask import Flask, request
 
 from routes import auth, client

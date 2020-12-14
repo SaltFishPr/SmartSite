@@ -1,8 +1,7 @@
 # !/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# @author: saltfish
 # @file: auth.py
-# @date: 2020/05/20
+# @date: 2020/12/13
 """
 认证蓝图 Blueprint
 认证蓝图将包括注册新用户、登录和注销视图。
