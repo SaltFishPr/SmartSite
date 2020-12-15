@@ -6,7 +6,7 @@ import json
 import redis
 from typing import List
 
-from utils import id_to_key
+from utils import id_to_key, key_to_id
 
 pool = redis.ConnectionPool(host="localhost", port=6379, decode_responses=True)
 
@@ -350,8 +350,18 @@ class EmployeeInfo:
             return True
         return False
 
-    def update(self) -> bool:
-        pass
+    def update(self, employee_name, employee_age) -> bool:
+        """
+        更新该员工信息
+        :param employee_name: 员工姓名
+        :param employee_age: 员工年龄
+        :return: 成功返回 True，否则返回 False
+        """
+        data = [self.__employee_id, employee_name, employee_age]
+        if not self.is_exist():
+            return False
+        self.__r.hset(self.__employee_key, "data", json.dumps(data))
+        return True
 
     def get_data(self) -> List:
         """
@@ -476,3 +486,14 @@ class GroupInfo:
         leader_num = int(self.__r.hget(self.__group_key, "leader_num"))
         leader_num += a
         self.__r.hset(self.__group_key, "leader_num", leader_num)
+
+
+def get_all_employees():
+    r = redis.Redis(connection_pool=pool)
+    employees = r.keys(pattern="EmployeeInfo:*")
+    r.close()
+    res = []
+    for employee in employees:
+        tmp = EmployeeInfo(key_to_id(employee))
+        res.append({"info": tmp.get_data(), "groups": tmp.get_groups()})
+    return res
