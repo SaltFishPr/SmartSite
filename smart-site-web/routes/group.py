@@ -11,11 +11,10 @@ bp = Blueprint("group", __name__, url_prefix="/group")
 
 @bp.route("/create", methods=("GET", "POST"))
 def create_group():
-    data = {"flag": False,
-            "message": "未执行创建"}
+    data = {"flag": False, "message": "未执行创建"}
     if request.method == "POST":
         # print(json.loads(request.form["data"]))
-        group_id = (json.loads(request.form["data"])["groupId"])
+        group_id = json.loads(request.form["data"])["groupId"]
         group = db.GroupInfo(group_id)
         employee_string: str = json.loads(request.form["data"])["groupMember"]
         employee_list = employee_string.split("-")
@@ -26,37 +25,37 @@ def create_group():
         for leader in leader_list:
             if group.get_leader_num() == 3:
                 data["flag"] = False
-                data["message"] = "The number of group leaders in the group reaches the upper limit"
+                data[
+                    "message"
+                ] = "The number of group leaders in the group reaches the upper limit"
                 return data
             group.add_employee(int(leader), True)
         data["flag"] = True
         data["message"] = "successfullyCreatedGroup"
-        return json.dumps(data)
-    return json.dumps(data)
+        return data
+    return data
 
 
 @bp.route("/delete", methods=("GET", "POST"))
 def delete_group():
-    data = {"flag": False,
-            "message": "未执行删除"}
+    data = {"flag": False, "message": "未执行删除"}
     if request.method == "POST":
         group_id = (json.loads(request.form["data"]))["groupId"]
         group = db.GroupInfo(group_id)
         if group.delete_group():
             data["flag"] = True
             data["message"] = "groupDeletedSuccessfully"
-            return json.dumps(data)
+            return data
         else:
             data["flag"] = False
             data["message"] = "failedToDeleteGroup"
-            return json.dumps(data)
-    return json.dumps(data)
+            return data
+    return data
 
 
 @bp.route("/update", methods=("GET", "POST"))
 def update():
-    data = {"flag": False,
-            "message": "未执行更新小组"}
+    data = {"flag": False, "message": "未执行更新小组"}
     if request.method == "POST":
 
         group_id = json.loads(request.form["data"])["groupId"]
@@ -72,13 +71,15 @@ def update():
         for leader in leader_list:
             if group.get_leader_num() == 3:
                 data["flag"] = False
-                data["message"] = "The number of group leaders in the group reaches the upper limit"
+                data[
+                    "message"
+                ] = "The number of group leaders in the group reaches the upper limit"
                 return data
             group.add_employee(int(leader), True)
         data["flag"] = True
         data["message"] = "successfullyUpdateGroup"
-        return json.dumps(data)
-    return json.dumps(data)
+        return data
+    return data
 
 
 if __name__ == "__main__":

@@ -21,14 +21,13 @@ def get_all_employees():
             "resultTotal": len(employee_list),
             "resultList": employee_list[start:end],
         }
-        return json.dumps(data)
+        return data
 
 
 @bp.route("/create", methods=("GET", "POST"))
 def create_employee():
     if request.method == "POST":
         data = json.loads(request.form["data"])
-        print(data)
         employee = db.EmployeeInfo(int(data["employeeId"]))
         if employee.insert(data["employeeName"], data["employeeGroup"]):
             return {"message": "创建成功"}
@@ -41,8 +40,8 @@ def delete_employee():
         data = json.loads(request.form["data"])
         employee = db.EmployeeInfo(data["employee_id"])
         if employee.delete():
-            return "删除成功"
-        return "删除失败"
+            return {"message": "删除成功"}
+        return {"message": "删除失败"}
 
 
 @bp.route("/update", methods=("GET", "POST"))
@@ -51,5 +50,5 @@ def update_employee():
         data = json.loads(request.form["data"])
         employee = db.EmployeeInfo(data["employee_id"])
         if employee.update(data["employee_name"], data["employee_age"]):
-            return "更新成功"
-        return "更新失败"
+            return {"message": "更新成功"}
+        return {"message": "更新失败"}
