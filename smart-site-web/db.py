@@ -6,7 +6,7 @@ import json
 import redis
 from typing import List
 
-from utils import id_to_key
+from utils import id_to_key, key_to_id
 
 pool = redis.ConnectionPool(host="localhost", port=6379, decode_responses=True)
 
@@ -437,6 +437,7 @@ class GroupInfo:
         :return: 删除成功返回True
         """
         employee = self.get_employee(employee_id)
+
         employee_info = EmployeeInfo(employee_id)
         joined_groups = employee_info.get_groups()
         if self.__r.hdel(self.__group_key, employee_id):
@@ -480,20 +481,13 @@ class GroupInfo:
         """得到组长的数量"""
         return int(self.__r.hget(self.__group_key, "leader_num"))
 
-if __name__ == '__main__':
-    # tmp = GroupInfo(1)
-    # print(tmp.get_all())
-    # tmp.add_employee(2,False)
-    # print(tmp.get_all())
-    # tmp_group = GroupInfo(1)
-    # print(tmp_group.get_all())
-    #tmp_staff = EmployeeInfo(4)
-    #tmp_staff.insert("WQ",18)
-    #print(tmp_staff.get_data())
-    tmp = GroupInfo(1)
-    #tmp.add_employee(2,True)
-    #tmp.add_employee(4,False)
-    all_employee = []
-    for employee in tmp.get_all():
-        all_employee.append(employee[0])
-    print(all_employee)
+
+def get_all_employees():
+    r = redis.Redis(connection_pool=pool)
+    employees = r.keys(pattern="EmployeeInfo:*")
+    r.close()
+    res = []
+    for employee in employees:
+        tmp = EmployeeInfo(key_to_id(employee))
+        res.append({"info": tmp.get_data(), "groups": tmp.get_groups()})
+    return res

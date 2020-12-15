@@ -4,12 +4,7 @@
 # @date: 2020/12/13
 from flask import Blueprint, request
 
-bp = Blueprint("contract", __name__)
-
-
-@bp.route("/")
-def index():
-    return "index"
+bp = Blueprint("contract", __name__, url_prefix="/contract")
 
 
 @bp.route("/getList")
