@@ -4,7 +4,7 @@
 # @date: 2020/12/13
 from flask import Flask
 
-from routes import auth, contract
+from routes import auth, contract ,group
 
 
 def create_app(test_config=None):
@@ -21,6 +21,7 @@ def create_app(test_config=None):
 
     app.register_blueprint(auth.bp)  # 注册认证蓝图
     app.register_blueprint(contract.bp)  # 注册博客蓝图
+    app.register_blueprint(group.bp)
 
     # 关联端点名称 'index' 和 / URL
     # 这样 url_for('index') 或 url_for('blog.index') 都会有效

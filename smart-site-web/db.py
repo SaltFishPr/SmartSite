@@ -437,13 +437,12 @@ class GroupInfo:
         :return: 删除成功返回True
         """
         employee = self.get_employee(employee_id)
-
         employee_info = EmployeeInfo(employee_id)
         joined_groups = employee_info.get_groups()
         if self.__r.hdel(self.__group_key, employee_id):
             if employee["is_leader"]:
                 self.update_leader_num(-1)
-            joined_groups.remove(employee_id)
+            joined_groups.remove(self.__group_id)
             employee_info.update_groups(joined_groups)
             return True
         return False
@@ -476,3 +475,25 @@ class GroupInfo:
         leader_num = int(self.__r.hget(self.__group_key, "leader_num"))
         leader_num += a
         self.__r.hset(self.__group_key, "leader_num", leader_num)
+
+    def get_leader_num(self):
+        """得到组长的数量"""
+        return int(self.__r.hget(self.__group_key, "leader_num"))
+
+if __name__ == '__main__':
+    # tmp = GroupInfo(1)
+    # print(tmp.get_all())
+    # tmp.add_employee(2,False)
+    # print(tmp.get_all())
+    # tmp_group = GroupInfo(1)
+    # print(tmp_group.get_all())
+    #tmp_staff = EmployeeInfo(4)
+    #tmp_staff.insert("WQ",18)
+    #print(tmp_staff.get_data())
+    tmp = GroupInfo(1)
+    #tmp.add_employee(2,True)
+    #tmp.add_employee(4,False)
+    all_employee = []
+    for employee in tmp.get_all():
+        all_employee.append(employee[0])
+    print(all_employee)
