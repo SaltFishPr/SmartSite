@@ -3,9 +3,8 @@
 # @file: db.py
 # @date: 2020/12/2
 import json
-from typing import List
-
 import redis
+from typing import List
 
 from utils import id_to_key
 

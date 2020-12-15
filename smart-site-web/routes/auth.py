@@ -42,7 +42,6 @@ def register():
 
         if error is None:
             user_info.insert(password, description)
-            print("register success")
             return redirect(url_for("auth.login"))
 
         flash(error)  # 用于储存在渲染模块时可以调用的信息
@@ -68,7 +67,6 @@ def login():
         if error is None:
             session.clear()
             session["user_id"] = user[0]
-            print("login success")
             return redirect(url_for("index"))
 
         flash(error)
