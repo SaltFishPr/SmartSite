@@ -5,11 +5,13 @@
 from flask import Flask
 
 from routes import auth, contract, employee
+from flask_cors import *
 
 
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__)
+    CORS(app, supports_credentials=True)
     app.config.from_mapping(SECRET_KEY="dev")
 
     if test_config is None:
