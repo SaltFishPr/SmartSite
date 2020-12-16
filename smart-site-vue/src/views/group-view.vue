@@ -136,10 +136,7 @@ export default {
       },
       formRules: {
         //表单规则
-        groupId: [
-          { required: true, message: "请输入小组编号" },
-          { min: 1, max: 5, message: "长度在 3 到 5 个字符" },
-        ],
+        groupId: [{ required: true, message: "请输入小组编号" }],
         groupLeader: [
           { required: true, message: "请输入小组组长" },
           {
@@ -242,8 +239,8 @@ export default {
         .then(({ data }) => {
           console.log(data);
           //resultTotal为总数据条数，resultList为数据列表
-          this.groupList = data.resultList;
-          this.groupPage.totalResult = data.resultTotal;
+          this.groupList = data["resultList"];
+          this.groupPage.totalResult = data["resultTotal"];
           this.tableLoading = false;
         })
         .catch((e) => {
@@ -326,13 +323,16 @@ export default {
         }
       })
         .then(() => {
-          //删除小组
-          // service({
-          //   url: "/group/delete",
-          //   data: {
-          //     groupId: row.groupId,
-          //   },
-          // });
+          service({
+            url: "/group/delete",
+            data: {
+              groupId: row.groupId,
+            },
+          }).then(({ data }) => {
+            console.log(data);
+            alert(data.message);
+            this.groupListGet();
+          });
         })
         .catch(() => {
           console.log("删除失败");

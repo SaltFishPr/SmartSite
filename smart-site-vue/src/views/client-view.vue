@@ -143,10 +143,7 @@ export default {
       },
       formRules: {
         //表单规则
-        clientId: [
-          { required: true, message: "请输入委托方编号" },
-          { min: 1, max: 5, message: "长度在 3 到 5 个字符" },
-        ],
+        clientId: [{ required: true, message: "请输入委托方编号" }],
       },
       formItems: [
         //表单项
@@ -323,6 +320,10 @@ export default {
             data: {
               clientId: row.clientId,
             },
+          }).then(({ data }) => {
+            console.log(data);
+            alert(data.message);
+            this.groupListGet();
           });
         })
         .catch(() => {
