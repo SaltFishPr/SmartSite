@@ -580,7 +580,7 @@ class GroupInfo:
         获取改组内的数据字典
         :return: 数据字典{"groupID":int,"groupMember":list,"groupLeader":list}
         """
-        res = {}
+        res = []
         group_member = []
         group_leader = []
         data = self.__r.hgetall(self.__group_key)
@@ -591,11 +591,11 @@ class GroupInfo:
                 group_leader.append(k)
             else:
                 group_member.append(k)
-        res = {
-            "groupID": self.__group_id,
+        res.append({
+            "groupId": self.__group_id,
             "groupMember": "-".join(group_member),
             "groupLeader": "-".join(group_leader),
-        }
+        })
         return res
 
 
