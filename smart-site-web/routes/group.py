@@ -106,6 +106,7 @@ def get_all_group():
             }
             return json.dumps(data)
         else:
+            search_key = int(search_key)
             group = db.GroupInfo(search_key)
             if group.is_exist():
                 data = {"resultTotal": 1, "resultList": group.get_group_dict()}

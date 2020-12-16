@@ -647,5 +647,6 @@ def get_all_group():
 
 
 if __name__ == "__main__":
-    r = redis.Redis(connection_pool=pool)
-    print(r.keys())
+    tmp = EmployeeInfo(4)
+    print(tmp.insert("ccc",18))
+    print(tmp.get_data())

@@ -25,7 +25,7 @@ def get_client_contract():
     return data
 
 
-@bp.route("/create", methods="POST")
+@bp.route("/create", methods=("POST",))
 def create_employee():
     data = json.loads(request.form["data"])
     contract = db.ClientInfo(int(data["contractId"]))
@@ -34,7 +34,7 @@ def create_employee():
     return {"message": "创建失败"}
 
 
-@bp.route("/delete", methods="POST")
+@bp.route("/delete", methods=("POST",))
 def delete_employee():
     data = json.loads(request.form["data"])
     contract = db.ClientInfo(int(data["contractId"]))
@@ -43,7 +43,7 @@ def delete_employee():
     return {"message": "删除失败"}
 
 
-@bp.route("/update", methods="POST")
+@bp.route("/update", methods=("POST",))
 def update_employee():
     data = json.loads(request.form["data"])
     contract = db.ClientInfo(int(data["contractId"]))

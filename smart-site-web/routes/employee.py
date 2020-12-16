@@ -21,7 +21,7 @@ def get_all_employees():
             "resultTotal": len(employee_list),
             "resultList": employee_list[start:end],
         }
-        return data
+        return json.dumps(data)
 
 
 @bp.route("/create", methods=("GET", "POST"))
