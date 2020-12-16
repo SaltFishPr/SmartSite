@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # @file: group.py
 # @date: 2020/12/15
-from flask import Blueprint, request, render_template, json
+from flask import Blueprint, request, json
 
 import db
 
@@ -88,20 +88,21 @@ def update():
 
 @bp.route("/getList", methods=("GET", "POST"))
 def get_all_group():
-    data = {
-        "resultTotal": 0,
-        "resultList": None
-    }
+    data = {"resultTotal": 0, "resultList": None}
     if request.method == "POST":
         rev_data = json.loads(request.form["data"])
-        page, size, search_key = rev_data["page"], rev_data["size"], rev_data["searchKey"]
+        page, size, search_key = (
+            rev_data["page"],
+            rev_data["size"],
+            rev_data["searchKey"],
+        )
         if search_key == "":
             group_list = db.get_all_group()
             start = (page - 1) * size
             end = page * size if page * size <= len(group_list) else len(group_list)
             data = {
                 "resultTotal": len(db.get_all_group()),
-                "resultList": group_list[start:end]
+                "resultList": group_list[start:end],
             }
             return json.dumps(data)
         else:
@@ -111,8 +112,11 @@ def get_all_group():
                     "resultTotal": 1,
                     "resultList": group.get_group_dict()
                 }
-            return json.dumps(data)
+                return json.dumps(data)
+            else:
+                data = {
+                    "resultTotal": 0,
+                    "resultList":None
+                }
+                return json.dumps(data)
 
-
-if __name__ == "__main__":
-    pass
