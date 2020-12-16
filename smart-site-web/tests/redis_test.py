@@ -9,6 +9,5 @@ import redis
 import db
 
 if __name__ == "__main__":
-    # r = redis.Redis(connection_pool=db.pool)
-    # print(r.keys())
-    print()
+    r = redis.Redis(connection_pool=db.pool)
+    print(r.keys())

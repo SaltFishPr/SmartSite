@@ -88,7 +88,6 @@ def update():
 
 @bp.route("/getList", methods=("GET", "POST"))
 def get_all_group():
-    data = {"resultTotal": 0, "resultList": None}
     if request.method == "POST":
         rev_data = json.loads(request.form["data"])
         page, size, search_key = (

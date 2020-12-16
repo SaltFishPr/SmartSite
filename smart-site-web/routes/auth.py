@@ -30,18 +30,18 @@ def register():
         username = request.form["username"]
         password = request.form["password"]
         description = request.form["description"]
-        user_info = db.AdministratorInfo(username)
+        table = db.UserInfo()
         error = None
 
         if not username:
             error = "Username is required."
         elif not password:
             error = "Password is required."
-        elif user_info.is_exist():
+        elif table.is_exist(username):
             error = "User {} is already registered.".format(username)
 
         if error is None:
-            user_info.insert(password, description)
+            table.insert(username, password, description)
             return redirect(url_for("auth.login"))
 
         flash(error)  # 用于储存在渲染模块时可以调用的信息
@@ -58,15 +58,15 @@ def login():
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
-        user_info = db.AdministratorInfo(username)
+        table = db.UserInfo()
         error = None
-        user = user_info.get()
-        if not user_info.is_exist() or user == [] or user[1] != password:
+        user = table.get(username)
+        if not table.is_exist(username) or user == [] or user[1] != password:
             error = "Incorrect username or password."
 
         if error is None:
             session.clear()
-            session["user_id"] = user[0]
+            session["username"] = user[0]
             return redirect(url_for("index"))
 
         flash(error)
@@ -81,12 +81,12 @@ def load_logged_in_user():
     g.user 的持续时间比请求要长。如果没有用户 id ，或者 id 不存在，那么 g.user 将会是 None 。
     :return: Nothing
     """
-    user_id = session.get("user_id")
+    username = session.get("username")
 
-    if user_id is None:
+    if username is None:
         g.user = None
     else:
-        g.user = db.AdministratorInfo(user_id).get()
+        g.user = db.UserInfo().get(username)
 
 
 @bp.route("/logout")

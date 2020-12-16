@@ -7,7 +7,7 @@ import redis
 from typing import List
 
 import config
-from utils import id_to_key, key_to_id, random_id
+from utils import id_to_key, key_to_id, random_id, random_employee_id
 
 # decode_responses设置取出为字符串
 pool = redis.ConnectionPool(
@@ -18,213 +18,143 @@ pool = redis.ConnectionPool(
 )
 
 
-class AdministratorInfo:
-    """
-    管理员信息表：管理员用户名，密码，管理员描述
-    """
+class UserInfo:
+    """用户信息表：用户名，密码，用户身份"""
 
-    def __init__(self, administrator_username):
-        """
-        初始化管理员信息表
-        :param administrator_username: 管理员用户名
-        """
+    def __init__(self):
+        """初始化表信息"""
         self.__table_name = "ClientContractInfo"  # 表名
-        self.__administrator_username = administrator_username
-        self.__administrator_key = id_to_key(self.__table_name, administrator_username)
         self.__r = redis.Redis(connection_pool=pool)
 
     def __del__(self):
         self.__r.close()
 
-    def is_exist(self) -> bool:
-        if self.__r.exists(self.__administrator_key) == 1:
+    def is_exist(self, administrator_username) -> bool:
+        if self.__r.exists(id_to_key(self.__table_name, administrator_username)) == 1:
             return True
         return False
 
-    def insert(self, password: str, identity: str) -> bool:
+    def insert(self, administrator_username, password: str, identity: str) -> bool:
         """
         插入管理员信息
-        :param password:
-        :param identity:
+        :param administrator_username: 用户名
+        :param password: 密码
+        :param identity: 用户身份
         :return: 成功插入返回True，否则返回False
         """
-        data = [self.__administrator_username, password, identity]
-        return self.__r.setnx(self.__administrator_key, json.dumps(data))
+        data = [administrator_username, password, identity]
+        return self.__r.setnx(
+            id_to_key(self.__table_name, administrator_username), json.dumps(data)
+        )
 
-    def delete(self) -> bool:
+    def delete(self, administrator_username) -> bool:
         """
-        删除管理员信息
+        删除用户信息
+        :param administrator_username: 用户名
         :return: 成功删除返回True，否则返回False
         """
-        if self.__r.delete(self.__administrator_key) == 1:
+        if self.__r.delete(id_to_key(self.__table_name, administrator_username)) == 1:
             return True
         return False
 
-    def get(self) -> List:
+    def get(self, administrator_username) -> List:
         """
-        获取该管理员信息
-        :return: [username, password, 描述]
+        获取用户信息
+        :param administrator_username: 用户名
+        :return: [用户名, 密码, 用户身份]
         """
-        if not self.is_exist():
+        if not self.is_exist(administrator_username):
             return []
-        return json.loads(self.__r.get(self.__administrator_key))
+        return json.loads(
+            self.__r.get(id_to_key(self.__table_name, administrator_username))
+        )
 
 
 class ClientInfo:
-    """
-    委托方合同信息表：委托方ID、委托方名称、委托方描述等
-    """
+    """委托方信息表：委托方ID、委托方名称、委托方描述等"""
 
-    def __init__(self, client_id):
-        """
-        初始化该委托合同
-        :param client_id: 委托方ID
-        """
+    def __init__(self):
+        """初始化表信息"""
         self.__table_name = "ClientInfo"  # 表名
-        self.__client_id = client_id
-        self.__client_key = id_to_key(self.__table_name, client_id)
         self.__r = redis.Redis(connection_pool=pool)
 
     def __del__(self):
         self.__r.close()
 
-    def is_exist(self) -> bool:
-        if self.__r.exists(self.__client_key) == 1:
+    def is_exist(self, client_id: str) -> bool:
+        if self.__r.exists(id_to_key(self.__table_name, client_id)) == 1:
             return True
         return False
 
     def insert(self, client_name, client_description: str) -> bool:
         """
-        插入该委托方信息
+        插入委托方信息
         :param client_name: 委托方名称
         :param client_description: 委托方描述
         :return: 成功插入返回True，否则返回False
         """
-        data = [self.__client_id, client_name, client_description]
-        return self.__r.setnx(self.__client_key, json.dumps(data))
+        client_id = random_id()  # 生成委托方ID
+        while self.is_exist(client_id):
+            client_id = random_id()
 
-    def update(self, client_name, client_description) -> bool:
+        data = [client_id, client_name, client_description]
+        return self.__r.setnx(id_to_key(self.__table_name, client_id), json.dumps(data))
+
+    def update(self, client_id, client_name, client_description) -> bool:
         """
-        插入该委托方信息
+        插入委托方信息
+        :param client_id: 委托方ID
         :param client_name: 委托方名称
         :param client_description: 委托方描述
         :return: 成功插入返回True，否则返回False
         """
-        data = [self.__client_id, client_name, client_description]
-        if not self.is_exist():
+        data = [client_id, client_name, client_description]
+        if not self.is_exist(client_id):
             return False
-        self.__r.set(self.__client_key, json.dumps(data))
+        self.__r.set(id_to_key(self.__table_name, client_id), json.dumps(data))
         return True
 
-    def delete(self) -> bool:
+    def delete(self, client_id) -> bool:
         """
-        删除该委托方信息
+        删除委托方信息
+        :param client_id: 委托方ID
         :return: 成功删除返回True，否则返回False
         """
-        if self.__r.delete(self.__client_key) == 1:
+        if self.__r.delete(id_to_key(self.__table_name, client_id)) == 1:
             return True
         return False
 
-    def get(self) -> List:
+    def get(self, client_id) -> List:
         """
-        获取该委托人信息
+        获取委托方信息
+        :param client_id: 委托方ID
         :return: [委托方ID, 委托方名称, 委托方描述]
         """
-        if not self.is_exist():
+        if not self.is_exist(client_id):
             return []
-        return json.loads(self.__r.get(self.__client_key))
-
-
-class ContractInfo:
-    """
-    合同信息表：合同ID、合同内容、合同创建日期、委托方ID
-    """
-
-    def __init__(self):
-        """
-        初始化该合同
-        """
-        self.__table_name = "ContractInfo"  # 表名
-        self.__contract_id = random_id()
-        self.__contract_key = id_to_key(self.__table_name, self.__contract_id)
-        while self.is_exist():
-            self.__contract_id = random_id()
-            self.__contract_key = id_to_key(self.__table_name, self.__contract_id)
-        self.__r = redis.Redis(connection_pool=pool)
-
-    def __del__(self):
-        self.__r.close()
-
-    def is_exist(self) -> bool:
-        if self.__r.exists(self.__contract_key) == 1:
-            return True
-        return False
-
-    def insert(self, contract_content, contract_creation_date, client_id) -> bool:
-        """
-        插入合同信息
-        :param contract_content:
-        :param contract_creation_date:
-        :param client_id:
-        :return:
-        """
-        data = [self.__contract_id, contract_content, contract_creation_date, client_id]
-        return self.__r.setnx(self.__contract_key, json.dumps(data))
-
-    def update(self, contract_content, contract_creation_date, client_id) -> bool:
-
-        data = [self.__contract_id, contract_content, contract_creation_date, client_id]
-        if not self.is_exist():
-            return False
-        self.__r.set(self.__contract_key, json.dumps(data))
-        return True
-
-    def delete(self) -> bool:
-        """
-        删除该委托方信息
-        :return: 成功删除返回True，否则返回False
-        """
-        if self.__r.delete(self.__contract_key) == 1:
-            return True
-        return False
-
-    def get(self) -> List:
-        """
-        获取该委托人信息
-        :return: [委托方ID, 委托方名称, 委托方描述]
-        """
-        if not self.is_exist():
-            return []
-        return json.loads(self.__r.get(self.__contract_key))
+        return json.loads(self.__r.get(id_to_key(self.__table_name, client_id)))
 
 
 class ProjectInfo:
-    """
-    项目信息表：项目ID、委托方ID、检查体系ID、项目状态、项目风险值、项目创建时间、项目描述、项目负责人等
-    """
+    """项目信息表：项目ID、委托方ID、检查体系ID、项目状态、项目风险值、项目创建时间、项目描述、项目负责人等"""
 
     def __init__(self):
-        """初始化该项目信息"""
+        """初始化表信息"""
         self.__table_name = "ProjectInfo"  # 表名
-        self.__project_id = random_id()
-        self.__project_key = id_to_key(self.__table_name, self.__project_id)
-        while self.is_exist():
-            self.__project_id = random_id()
-            self.__project_key = id_to_key(self.__table_name, self.__project_id)
         self.__r = redis.Redis(connection_pool=pool)
 
     def __del__(self):
         self.__r.close()
 
-    def is_exist(self) -> bool:
-        if self.__r.exists(self.__project_key) == 1:
+    def is_exist(self, project_id: str) -> bool:
+        if self.__r.exists(id_to_key(self.__table_name, project_id)) == 1:
             return True
         return False
 
     def insert(
         self,
-        client_id: int,
-        check_system_id: int,
+        client_id,
+        check_system_id,
         project_status,
         project_risk_value,
         project_creation_time,
@@ -242,8 +172,12 @@ class ProjectInfo:
         :param project_manager: 项目负责人
         :return: 成功插入返回 True，否则返回 False
         """
+        project_id = random_id()  # 生成项目ID
+        while self.is_exist(project_id):
+            project_id = random_id()
+
         data = [
-            self.__project_id,
+            project_id,
             client_id,
             check_system_id,
             project_status,
@@ -252,100 +186,185 @@ class ProjectInfo:
             project_description,
             project_manager,
         ]
-        return self.__r.setnx(self.__project_key, json.dumps(data))
+        return self.__r.setnx(
+            id_to_key(self.__table_name, project_id), json.dumps(data)
+        )
 
-    def delete(self) -> bool:
+    def delete(self, project_id) -> bool:
         """
         删除项目信息
+        :param project_id: 项目ID
         :return: 成功删除返回True，否则返回False
         """
-        if self.__r.delete(self.__project_key) == 1:
+        if self.__r.delete(id_to_key(self.__table_name, project_id)) == 1:
             return True
         return False
 
-    def get(self) -> List:
+    def get(self, project_id) -> List:
         """
         获取项目信息
+        :param project_id: 项目ID
         :return: [项目 ID, 委托方 ID, 检查体系 ID, 项目状态, 项目风险值, 项目创建时间, 项目描述, 项目负责人]
         """
-        if not self.is_exist():
+        if not self.is_exist(project_id):
             return []
-        return json.loads(self.__r.get(self.__project_key))
+        return json.loads(self.__r.get(id_to_key(self.__table_name, project_id)))
 
 
-class CheckInfo:
-    """
-    检查信息表：检查ID、项目ID、检查体系第一级ID、第二级ID、检查员员工ID、问题描述等
-    """
+class ContractInfo:
+    """合同信息表：合同ID、合同内容、合同创建日期、委托方ID"""
 
-    def __init__(self, check_id):
-        """
-        初始化该检查条目
-        :param check_id: 检查条目ID
-        """
-        self.__table_name = "CheckInfo"  # 表名
-        self.__check_id = check_id
-        self.__check_key = id_to_key(self.__table_name, check_id)
+    def __init__(self):
+        """初始化表信息"""
+        self.__table_name = "ContractInfo"  # 表名
         self.__r = redis.Redis(connection_pool=pool)
 
     def __del__(self):
         self.__r.close()
 
-    def is_exist(self) -> bool:
-        if self.__r.exists(self.__check_key) == 1:
+    def is_exist(self, contract_id: str) -> bool:
+        if self.__r.exists(id_to_key(self.__table_name, contract_id)) == 1:
+            return True
+        return False
+
+    def insert(
+        self,
+        contract_content: str,
+        contract_creation_date: str,
+        client_id: int,
+    ) -> bool:
+        """
+        插入合同信息
+        :param contract_content: 合同内容
+        :param contract_creation_date: 合同创建日期
+        :param client_id: 委托方ID
+        :return: 成功插入返回True，否则返回False
+        """
+        contract_id = random_id()  # 生成合同ID
+        while self.is_exist(contract_id):
+            contract_id = random_id()
+
+        data = [contract_id, contract_content, contract_creation_date, client_id]
+        return self.__r.setnx(
+            id_to_key(self.__table_name, contract_id), json.dumps(data)
+        )
+
+    def update(
+        self,
+        contract_id: str,
+        contract_content: str,
+        contract_creation_date: str,
+        client_id: int,
+    ) -> bool:
+        """
+        更新合同信息
+        :param contract_id: 合同ID
+        :param contract_content: 合同内容
+        :param contract_creation_date: 合同创建时间
+        :param client_id: 委托方ID
+        :return: 成功插入返回True，否则返回False
+        """
+        data = [contract_id, contract_content, contract_creation_date, client_id]
+        if not self.is_exist(contract_id):
+            return False
+        self.__r.set(id_to_key(self.__table_name, contract_id), json.dumps(data))
+        return True
+
+    def delete(self, contract_id: str) -> bool:
+        """
+        删除合同信息
+        :param contract_id: 合同ID
+        :return: 成功删除返回True，否则返回False
+        """
+        if self.__r.delete(id_to_key(self.__table_name, contract_id)) == 1:
+            return True
+        return False
+
+    def get(self, contract_id: str) -> List:
+        """
+        获取合同信息
+        :param contract_id: 合同ID
+        :return: [合同ID, 合同内容, 合同创建时间, 委托方ID]
+        """
+        if not self.is_exist(contract_id):
+            return []
+        return json.loads(self.__r.get(id_to_key(self.__table_name, contract_id)))
+
+    def get_all(self):
+        contracts = self.__r.keys(pattern="ClientContractInfo:*")
+        res = []
+        for contract in contracts:
+            res.append(self.get(key_to_id(contract)))
+        return res
+
+
+class CheckInfo:
+    """检查信息表：检查ID、项目ID、检查体系第一级ID、第二级ID、检查员员工ID、问题描述等"""
+
+    def __init__(self):
+        """初始化信息表"""
+        self.__table_name = "CheckInfo"  # 表名
+        self.__r = redis.Redis(connection_pool=pool)
+
+    def __del__(self):
+        self.__r.close()
+
+    def is_exist(self, check_id) -> bool:
+        if self.__r.exists(id_to_key(self.__table_name, check_id)) == 1:
             return True
         return False
 
     def insert(
         self,
         project_id: int,
-        check_system_lv_1: int,
-        check_system_lv_2: int,
+        check_system_route: str,
         employee_id: int,
         problem_description: str,
     ) -> bool:
         """
-        插入一个检查条目
+        插入一个检查信息
         :param project_id: 项目ID
-        :param check_system_lv_1: 检查体系第一级ID
-        :param check_system_lv_2: 检查体系第二级ID
+        :param check_system_route: 检查体系（例：安全检查->人员安全检查）
         :param employee_id: 检查员员工ID
         :param problem_description: 问题描述
         :return: 成功返回 True，否则返回 False
         """
+        check_id = random_id()  # 生成检查信息ID
+        while self.is_exist(check_id):
+            check_id = random_id()
+
         data = [
-            self.__check_id,
+            check_id,
             project_id,
-            check_system_lv_1,
-            check_system_lv_2,
+            check_system_route,
             employee_id,
             problem_description,
         ]
-        return self.__r.setnx(self.__check_key, json.dumps(data))
+        return self.__r.setnx(id_to_key(self.__table_name, check_id), json.dumps(data))
 
-    def delete(self) -> int:
+    def delete(self, check_id) -> int:
         """
-        删除该检查信息
+        删除检查信息
+        :param check_id: 检查信息ID
         :return: 成功返回 True，否则返回 False
         """
-        if self.__r.delete(self.__check_key) == 1:
+        if self.__r.delete(id_to_key(self.__table_name, check_id)) == 1:
             return True
         return False
 
-    def get(self) -> List:
+    def get(self, check_id) -> List:
         """
-        获取该检查信息
-        :return: [检查ID, 项目ID, 检查体系第一级ID, 第二级ID, 问题描述]
+        获取检查信息
+        :param check_id: 检查信息ID
+        :return: [检查ID, 项目ID, 检查体系, 问题描述]
         """
-        if not self.is_exist():
+        if not self.is_exist(check_id):
             return []
-        return json.loads(self.__r.get(self.__check_key))
+        return json.loads(self.__r.get(id_to_key(self.__table_name, check_id)))
 
 
 class CheckSystemInfo:
-    """
-    检查体系表：当前结点ID、前置结点ID（第一级改字段为0）等
-    """
+    """检查体系表：当前结点ID、前置结点ID（第一级改字段为0）等"""
 
     def __init__(self, check_system_id):
         self.__table_name = "CheckSystemInfo"  # 表名
@@ -391,89 +410,124 @@ class CheckSystemInfo:
 
 
 class EmployeeInfo:
-    """
-    员工信息表：员工ID、员工姓名、员工年龄等
-    """
+    """员工信息表：员工ID、员工姓名、员工年龄等"""
 
-    def __init__(self, employee_id):
-        """
-        初始化该员工信息
-        :param employee_id: 员工ID
-        """
+    def __init__(self):
+        """初始化信息表"""
         self.__table_name = "EmployeeInfo"  # 表名
-        self.__employee_id = employee_id
-        self.__employee_key = id_to_key(self.__table_name, employee_id)
         self.__r = redis.Redis(connection_pool=pool)
 
     def __del__(self):
         self.__r.close()
 
-    def is_exist(self) -> bool:
-        if self.__r.exists(self.__employee_key) == 1:
+    def is_exist(self, employee_id) -> bool:
+        if self.__r.exists(id_to_key(self.__table_name, employee_id)) == 1:
             return True
         return False
 
     def insert(self, employee_name: str, employee_age: int) -> bool:
         """
-        插入该员工信息
+        插入员工信息
         :param employee_name: 员工姓名
         :param employee_age: 员工年龄
         :return: 成功返回 True，否则返回 False
         """
-        data = [self.__employee_id, employee_name, employee_age]
-        return self.__r.hsetnx(
-            self.__employee_key, "data", json.dumps(data)
-        ) and self.__r.hsetnx(self.__employee_key, "groups", json.dumps([]))
+        employee_id = random_employee_id()  # 生成员工信息ID
+        while self.is_exist(employee_id):
+            employee_id = random_employee_id()
 
-    def delete(self) -> bool:
+        data = [employee_id, employee_name, employee_age]
+        return self.__r.hsetnx(
+            id_to_key(self.__table_name, employee_id), "data", json.dumps(data)
+        ) and self.__r.hsetnx(
+            id_to_key(self.__table_name, employee_id), "groups", json.dumps([])
+        )
+
+    def delete(self, employee_id) -> bool:
         """
         删除该员工信息
+        :param employee_id: 员工ID
         :return: 成功返回 True，否则返回 False
         """
-        if self.__r.delete(self.__employee_key) == 1:
+        if self.__r.delete(id_to_key(self.__table_name, employee_id)) == 1:
             return True
         return False
 
-    def update(self, employee_name, employee_age) -> bool:
+    def update_data(self, employee_id, employee_name, employee_age) -> bool:
         """
-        更新该员工信息
+        更新员工信息
+        :param employee_id: 员工ID
         :param employee_name: 员工姓名
         :param employee_age: 员工年龄
         :return: 成功返回 True，否则返回 False
         """
-        data = [self.__employee_id, employee_name, employee_age]
-        if not self.is_exist():
+        data = [employee_id, employee_name, employee_age]
+        if not self.is_exist(employee_id):
             return False
-        self.__r.hset(self.__employee_key, "data", json.dumps(data))
+        self.__r.hset(
+            id_to_key(self.__table_name, employee_id), "data", json.dumps(data)
+        )
         return True
 
-    def get_data(self) -> List:
+    def get_data(self, employee_id) -> List:
         """
-        获取该员工信息
+        获取员工信息
+        :param employee_id: 员工ID
         :return: [员工ID, 员工姓名, 员工年龄]
         """
-        if not self.is_exist():
+        if not self.is_exist(employee_id):
             return []
-        data = self.__r.hget(self.__employee_key, "data")
+        data = self.__r.hget(id_to_key(self.__table_name, employee_id), "data")
         return json.loads(data)
 
-    def get_groups(self) -> List:
+    def update_groups(self, employee_id, groups: List):
         """
-        获取该员工所在小组
+        更新小组信息
+        :param employee_id: 员工ID
+        :param groups: 小组列表
+        :return:
+        """
+        self.__r.hset(
+            id_to_key(self.__table_name, employee_id), "groups", json.dumps(groups)
+        )
+
+    def get_groups(self, employee_id) -> List:
+        """
+        获取员工所在小组
+        :param employee_id: 员工ID
         :return: 包含小组ID的列表
         """
-        if not self.is_exist():
+        if not self.is_exist(employee_id):
             return []
-        return json.loads(self.__r.hget(self.__employee_key, "groups"))
+        return json.loads(
+            self.__r.hget(id_to_key(self.__table_name, employee_id), "groups")
+        )
 
-    def update_groups(self, groups: List):
-        self.__r.hset(self.__employee_key, "groups", json.dumps(groups))
+    def get_all(self):
+        """
+        获取所有员工信息
+        :return: [{"employeeId": ,"employeeName": ,"employeeAge": ,"employeeGroups":[]}]
+        """
+        employee_keys = self.__r.keys(pattern="EmployeeInfo:*")
+        res = []
+        table = EmployeeInfo()
+        for employee_key in employee_keys:
+            tmp_data = table.get_data(key_to_id(employee_key))
+            res.append(
+                {
+                    "employeeId": tmp_data[0],
+                    "employeeName": tmp_data[1],
+                    "employeeAge": tmp_data[2],
+                    "employeeGroups": ",".join(
+                        table.get_groups(key_to_id(employee_key))
+                    ),
+                }
+            )
+        return res
 
 
 class GroupInfo:
-    """
-    小组成员表：小组ID、员工ID、组长标志等
-    """
+    """小组成员表：小组ID、员工ID、组长标志等"""
 
     def __init__(self, group_id):
         """
@@ -513,14 +567,14 @@ class GroupInfo:
         # 如果是第一个员工加入则初始化leader_num为0
         self.__r.hsetnx(self.__group_key, "leader_num", 0)
 
-        employee_info = EmployeeInfo(employee_id)
-        joined_groups = employee_info.get_groups()
+        employee_info = EmployeeInfo()
+        joined_groups = employee_info.get_groups(employee_id)
 
         if self.__r.hsetnx(self.__group_key, employee_id, json.dumps(data)):
             if is_leader:
                 self.update_leader_num(1)
             joined_groups.append(self.__group_id)
-            employee_info.update_groups(joined_groups)
+            employee_info.update_groups(employee_id, joined_groups)
             return True
         return False
 
@@ -532,13 +586,13 @@ class GroupInfo:
         """
         employee = self.get_employee(employee_id)
 
-        employee_info = EmployeeInfo(employee_id)
-        joined_groups = employee_info.get_groups()
+        employee_info = EmployeeInfo()
+        joined_groups = employee_info.get_groups(employee_id)
         if self.__r.hdel(self.__group_key, employee_id):
             if employee["is_leader"]:
                 self.update_leader_num(-1)
             joined_groups.remove(self.__group_id)
-            employee_info.update_groups(joined_groups)
+            employee_info.update_groups(employee_id, joined_groups)
             return True
         return False
 
@@ -580,7 +634,6 @@ class GroupInfo:
         获取改组内的数据字典
         :return: 数据字典{"groupID":int,"groupMember":list,"groupLeader":list}
         """
-        res = {}
         group_member = []
         group_leader = []
         data = self.__r.hgetall(self.__group_key)
@@ -597,28 +650,6 @@ class GroupInfo:
             "groupLeader": "-".join(group_leader),
         }
         return res
-
-
-def get_all_employees():
-    r = redis.Redis(connection_pool=pool)
-    employees = r.keys(pattern="EmployeeInfo:*")
-    r.close()
-    res = []
-    for employee in employees:
-        tmp = EmployeeInfo(key_to_id(employee))
-        res.append({"info": tmp.get_data(), "groups": tmp.get_groups()})
-    return res
-
-
-def get_all_contracts():
-    r = redis.Redis(connection_pool=pool)
-    contracts = r.keys(pattern="ClientContractInfo:*")
-    r.close()
-    res = []
-    for contract in contracts:
-        tmp = ClientInfo(key_to_id(contract))
-        res.append(tmp.get())
-    return res
 
 
 def get_all_group():
@@ -644,8 +675,3 @@ def get_all_group():
             }
         )
     return res
-
-
-if __name__ == "__main__":
-    r = redis.Redis(connection_pool=pool)
-    print(r.keys())
