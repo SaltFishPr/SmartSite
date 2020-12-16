@@ -29,12 +29,12 @@ class UserInfo:
     def __del__(self):
         self.__r.close()
 
-    def is_exist(self, administrator_username) -> bool:
+    def is_exist(self, administrator_username: str) -> bool:
         if self.__r.exists(id_to_key(self.__table_name, administrator_username)) == 1:
             return True
         return False
 
-    def insert(self, administrator_username, password: str, identity: str) -> bool:
+    def insert(self, administrator_username: str, password: str, identity: str) -> bool:
         """
         插入管理员信息
         :param administrator_username: 用户名
@@ -47,7 +47,7 @@ class UserInfo:
             id_to_key(self.__table_name, administrator_username), json.dumps(data)
         )
 
-    def delete(self, administrator_username) -> bool:
+    def delete(self, administrator_username: str) -> bool:
         """
         删除用户信息
         :param administrator_username: 用户名
@@ -57,7 +57,7 @@ class UserInfo:
             return True
         return False
 
-    def get(self, administrator_username) -> List:
+    def get(self, administrator_username: str) -> List:
         """
         获取用户信息
         :param administrator_username: 用户名
@@ -86,7 +86,7 @@ class ClientInfo:
             return True
         return False
 
-    def insert(self, client_name, client_description: str) -> bool:
+    def insert(self, client_name: str, client_description: str) -> bool:
         """
         插入委托方信息
         :param client_name: 委托方名称
@@ -100,7 +100,7 @@ class ClientInfo:
         data = [client_id, client_name, client_description]
         return self.__r.setnx(id_to_key(self.__table_name, client_id), json.dumps(data))
 
-    def update(self, client_id, client_name, client_description) -> bool:
+    def update(self, client_id: str, client_name: str, client_description: str) -> bool:
         """
         插入委托方信息
         :param client_id: 委托方ID
@@ -114,7 +114,7 @@ class ClientInfo:
         self.__r.set(id_to_key(self.__table_name, client_id), json.dumps(data))
         return True
 
-    def delete(self, client_id) -> bool:
+    def delete(self, client_id: str) -> bool:
         """
         删除委托方信息
         :param client_id: 委托方ID
@@ -124,7 +124,7 @@ class ClientInfo:
             return True
         return False
 
-    def get(self, client_id) -> List:
+    def get(self, client_id: str) -> List:
         """
         获取委托方信息
         :param client_id: 委托方ID
@@ -153,13 +153,13 @@ class ProjectInfo:
 
     def insert(
         self,
-        client_id,
-        check_system_id,
-        project_status,
-        project_risk_value,
-        project_creation_time,
-        project_description,
-        project_manager,
+        client_id: str,
+        check_system_id: str,
+        project_status: str,
+        project_risk_value: int,
+        project_creation_time: str,
+        project_description: str,
+        project_manager: str,
     ) -> bool:
         """
         插入该项目信息
@@ -190,7 +190,7 @@ class ProjectInfo:
             id_to_key(self.__table_name, project_id), json.dumps(data)
         )
 
-    def delete(self, project_id) -> bool:
+    def delete(self, project_id: str) -> bool:
         """
         删除项目信息
         :param project_id: 项目ID
@@ -200,7 +200,7 @@ class ProjectInfo:
             return True
         return False
 
-    def get(self, project_id) -> List:
+    def get(self, project_id: str) -> List:
         """
         获取项目信息
         :param project_id: 项目ID
@@ -231,7 +231,7 @@ class ContractInfo:
         self,
         contract_content: str,
         contract_creation_date: str,
-        client_id: int,
+        client_id: str,
     ) -> bool:
         """
         插入合同信息
@@ -254,7 +254,7 @@ class ContractInfo:
         contract_id: str,
         contract_content: str,
         contract_creation_date: str,
-        client_id: int,
+        client_id: str,
     ) -> bool:
         """
         更新合同信息
@@ -290,7 +290,7 @@ class ContractInfo:
             return []
         return json.loads(self.__r.get(id_to_key(self.__table_name, contract_id)))
 
-    def get_all(self):
+    def get_all(self) -> List:
         contracts = self.__r.keys(pattern="ClientContractInfo:*")
         res = []
         for contract in contracts:
@@ -309,16 +309,16 @@ class CheckInfo:
     def __del__(self):
         self.__r.close()
 
-    def is_exist(self, check_id) -> bool:
+    def is_exist(self, check_id: str) -> bool:
         if self.__r.exists(id_to_key(self.__table_name, check_id)) == 1:
             return True
         return False
 
     def insert(
         self,
-        project_id: int,
+        project_id: str,
         check_system_route: str,
-        employee_id: int,
+        employee_id: str,
         problem_description: str,
     ) -> bool:
         """
@@ -342,7 +342,7 @@ class CheckInfo:
         ]
         return self.__r.setnx(id_to_key(self.__table_name, check_id), json.dumps(data))
 
-    def delete(self, check_id) -> int:
+    def delete(self, check_id: str) -> bool:
         """
         删除检查信息
         :param check_id: 检查信息ID
@@ -352,7 +352,7 @@ class CheckInfo:
             return True
         return False
 
-    def get(self, check_id) -> List:
+    def get(self, check_id: str) -> List:
         """
         获取检查信息
         :param check_id: 检查信息ID
@@ -366,47 +366,18 @@ class CheckInfo:
 class CheckSystemInfo:
     """检查体系表：当前结点ID、前置结点ID（第一级改字段为0）等"""
 
-    def __init__(self, check_system_id):
+    def __init__(self):
+        """初始化信息表"""
         self.__table_name = "CheckSystemInfo"  # 表名
-        self.__check_system_id = check_system_id
-        self.__check_system_key = id_to_key(self.__table_name, check_system_id)
         self.__r = redis.Redis(connection_pool=pool)
 
     def __del__(self):
         self.__r.close()
 
-    def is_exist(self) -> bool:
-        if self.__r.exists(self.__check_system_key) == 1:
+    def is_exist(self, check_system_id: str) -> bool:
+        if self.__r.exists(id_to_key(self.__table_name, check_system_id)) == 1:
             return True
         return False
-
-    def insert(self, front_id, check_system_describe):
-        """
-        插入该检查体系信息
-        :param front_id: 前置检查体系ID
-        :param check_system_describe: 检查体系描述
-        :return:
-        """
-        data = [self.__check_system_id, front_id, check_system_describe]
-        return self.__r.setnx(self.__check_system_key, json.dumps(data))
-
-    def delete(self):
-        """
-        删除该检查体系信息
-        :return: 成功返回 True，否则返回 False
-        """
-        if self.__r.delete(self.__check_system_key) == 1:
-            return True
-        return False
-
-    def get(self):
-        """
-        得到该检查体系信息
-        :return: [当前结点ID, 前置结点ID, 节点描述]
-        """
-        if not self.is_exist():
-            return []
-        return json.loads(self.__r.get(self.__check_system_key))
 
 
 class EmployeeInfo:
@@ -420,7 +391,7 @@ class EmployeeInfo:
     def __del__(self):
         self.__r.close()
 
-    def is_exist(self, employee_id) -> bool:
+    def is_exist(self, employee_id: str) -> bool:
         if self.__r.exists(id_to_key(self.__table_name, employee_id)) == 1:
             return True
         return False
@@ -443,7 +414,7 @@ class EmployeeInfo:
             id_to_key(self.__table_name, employee_id), "groups", json.dumps([])
         )
 
-    def delete(self, employee_id) -> bool:
+    def delete(self, employee_id: str) -> bool:
         """
         删除该员工信息
         :param employee_id: 员工ID
@@ -453,7 +424,9 @@ class EmployeeInfo:
             return True
         return False
 
-    def update_data(self, employee_id, employee_name, employee_age) -> bool:
+    def update_data(
+        self, employee_id: str, employee_name: str, employee_age: int
+    ) -> bool:
         """
         更新员工信息
         :param employee_id: 员工ID
@@ -469,7 +442,7 @@ class EmployeeInfo:
         )
         return True
 
-    def get_data(self, employee_id) -> List:
+    def get_data(self, employee_id: str) -> List:
         """
         获取员工信息
         :param employee_id: 员工ID
@@ -480,18 +453,21 @@ class EmployeeInfo:
         data = self.__r.hget(id_to_key(self.__table_name, employee_id), "data")
         return json.loads(data)
 
-    def update_groups(self, employee_id, groups: List):
+    def update_groups(self, employee_id: str, groups: List) -> bool:
         """
         更新小组信息
         :param employee_id: 员工ID
         :param groups: 小组列表
         :return:
         """
+        if not self.is_exist(employee_id):
+            return False
         self.__r.hset(
             id_to_key(self.__table_name, employee_id), "groups", json.dumps(groups)
         )
+        return True
 
-    def get_groups(self, employee_id) -> List:
+    def get_groups(self, employee_id: str) -> List:
         """
         获取员工所在小组
         :param employee_id: 员工ID
@@ -503,7 +479,7 @@ class EmployeeInfo:
             self.__r.hget(id_to_key(self.__table_name, employee_id), "groups")
         )
 
-    def get_all(self):
+    def get_all(self) -> List:
         """
         获取所有员工信息
         :return: [{"employeeId": ,"employeeName": ,"employeeAge": ,"employeeGroups":[]}]
@@ -529,7 +505,7 @@ class EmployeeInfo:
 class GroupInfo:
     """小组成员表：小组ID、员工ID、组长标志等"""
 
-    def __init__(self, group_id):
+    def __init__(self, group_id: int):
         """
         初始化小组信息
         :param group_id: 小组ID
@@ -556,7 +532,7 @@ class GroupInfo:
             return True
         return False
 
-    def add_employee(self, employee_id: int, is_leader: bool) -> bool:
+    def add_employee(self, employee_id: str, is_leader: bool) -> bool:
         """
         插入小组组员信息
         :param employee_id: 员工ID
@@ -578,7 +554,7 @@ class GroupInfo:
             return True
         return False
 
-    def remove_employee(self, employee_id):
+    def remove_employee(self, employee_id: str):
         """
         删除组内某一员工
         :param employee_id: 员工ID
@@ -596,7 +572,7 @@ class GroupInfo:
             return True
         return False
 
-    def get_employee(self, employee_id) -> dict:
+    def get_employee(self, employee_id: str) -> dict:
         """
         获取该组一个员工的信息
         :param employee_id: 员工ID
@@ -619,7 +595,7 @@ class GroupInfo:
             res.append([int(k), json.loads(v)["is_leader"]])
         return res
 
-    def update_leader_num(self, a):
+    def update_leader_num(self, a: int):
         """更新组长数量"""
         leader_num = int(self.__r.hget(self.__group_key, "leader_num"))
         leader_num += a
@@ -661,7 +637,7 @@ def get_all_group():
     r.close()
     res = []
     for contract in contracts:
-        group_id = key_to_id(contract)
+        group_id = int(key_to_id(contract))
         tmp = GroupInfo(group_id)
         group_member = []
         group_leader = []
