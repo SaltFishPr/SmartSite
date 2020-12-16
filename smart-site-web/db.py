@@ -8,7 +8,7 @@ from typing import List
 
 from utils import id_to_key, key_to_id
 
-pool = redis.ConnectionPool(host="localhost", port=6379, decode_responses=True)
+pool = redis.ConnectionPool(host="192.168.31.87", port=6379, decode_responses=True, password="saltfish")
 
 
 class AdministratorInfo:

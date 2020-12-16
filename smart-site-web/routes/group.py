@@ -111,7 +111,14 @@ def get_all_group():
                     "resultTotal": 1,
                     "resultList": group.get_group_dict()
                 }
-            return json.dumps(data)
+                return json.dumps(data)
+            else:
+                data = {
+                    "resultTotal": 0,
+                    "resultList":None
+                }
+                return json.dumps(data)
+
 
 
 if __name__ == "__main__":
