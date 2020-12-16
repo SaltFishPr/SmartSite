@@ -141,15 +141,9 @@ export default {
       },
       formRules: {
         //表单规则
-        contractId: [
-          { required: true, message: "请输入合同编号" },
-          { min: 1, max: 5, message: "长度在 3 到 5 个字符" },
-        ],
+        contractId: [{ required: true, message: "请输入合同编号" }],
         clientId: [{ required: true, message: "请输入委托方编号" }],
-        contractDescription: [
-          { required: true, message: "请输入合同描述" },
-          { min: 3, max: 20, message: "长度在 3 到 20 个字符" },
-        ],
+        contractDescription: [{ required: true, message: "请输入合同描述" }],
       },
       formItems: [
         //表单项
@@ -326,6 +320,10 @@ export default {
             data: {
               contractId: row.contractId,
             },
+          }).then(({ data }) => {
+            console.log(data);
+            alert(data.message);
+            this.groupListGet();
           });
         })
         .catch(() => {

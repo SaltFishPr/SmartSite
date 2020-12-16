@@ -140,10 +140,7 @@ export default {
       },
       formRules: {
         //表单规则
-        employeeId: [
-          { required: true, message: "请输入员工编号" },
-          { min: 1, max: 5, message: "长度在 3 到 5 个字符" },
-        ],
+        employeeId: [{ required: true, message: "请输入员工编号" }],
         employeeName: [{ required: true, message: "请输入员工姓名" }],
       },
       formItems: [
@@ -322,6 +319,10 @@ export default {
             data: {
               employeeId: row.employeeId,
             },
+          }).then(({ data }) => {
+            console.log(data);
+            alert(data.message);
+            this.groupListGet();
           });
         })
         .catch(() => {

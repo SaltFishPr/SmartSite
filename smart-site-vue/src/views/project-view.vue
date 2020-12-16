@@ -181,10 +181,7 @@ export default {
       },
       formRules: {
         //表单规则
-        projectId: [
-          { required: true, message: "请输入员工编号" },
-          { min: 1, max: 5, message: "长度在 3 到 5 个字符" },
-        ],
+        projectId: [{ required: true, message: "请输入员工编号" }],
         projectName: [{ required: true, message: "请输入员工姓名" }],
         projectCheckGroupId: [
           { required: true, message: "请输入检查小组编号" },
@@ -450,13 +447,17 @@ export default {
         }
       })
         .then(() => {
-          //删除合约
-          // service({
-          //   url: "/project/delete",
-          //   data: {
-          //     projectId: row.projectId,
-          //   },
-          // });
+          // 删除合约
+          service({
+            url: "/project/delete",
+            data: {
+              projectId: row.projectId,
+            },
+          }).then(({ data }) => {
+            console.log(data);
+            alert(data.message);
+            this.groupListGet();
+          });
         })
         .catch(() => {
           console.log("删除失败");
