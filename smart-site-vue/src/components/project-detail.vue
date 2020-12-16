@@ -1,0 +1,12 @@
+<template>
+  <div>
+    <h3>详细项目</h3>
+    <div><span>项目ID：</span><span>1</span></div>
+    <div><span>项目创建日期：</span><span>2020.12.2</span></div>
+    <div><span>委托方名称：</span><span>阿斯顿</span></div>
+    <div><span>项目描述：</span><span>好好干</span></div>
+    <div><span>检查体系ID：</span><span>1</span></div>
+    <div><span>项目状态：</span><span>50</span></div>
+    <div><span>项目负责人：</span><span>丽丽亚</span></div>
+  </div>
+</template>

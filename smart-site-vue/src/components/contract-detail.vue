@@ -1,0 +1,9 @@
+<template>
+  <div>
+    <h3>详细合同</h3>
+    <div><span>合同编号：</span><span>1</span></div>
+    <div><span>合同创建日期：</span><span>2020.12.2</span></div>
+    <div><span>委托方名称：</span><span>阿斯顿</span></div>
+    <div><span>委托方意向：</span><span>好好干</span></div>
+  </div>
+</template>
