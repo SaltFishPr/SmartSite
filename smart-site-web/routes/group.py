@@ -16,6 +16,10 @@ def create_group():
         # print(json.loads(request.form["data"]))
         group_id = json.loads(request.form["data"])["groupId"]
         group = db.GroupInfo(group_id)
+        if group.is_exist():
+            data["flag"] = False
+            data["message"] = "theGroupAlreadyExists"
+            return json.dumps(data)
         employee_string: str = json.loads(request.form["data"])["groupMember"]
         employee_list = employee_string.split("-")
         for employee in employee_list:
@@ -28,12 +32,12 @@ def create_group():
                 data[
                     "message"
                 ] = "The number of group leaders in the group reaches the upper limit"
-                return data
+                return json.dumps(data)
             group.add_employee(int(leader), True)
         data["flag"] = True
         data["message"] = "successfullyCreatedGroup"
-        return data
-    return data
+        return json.dumps(data)
+    return json.dumps(data)
 
 
 @bp.route("/delete", methods=("GET", "POST"))
@@ -45,12 +49,12 @@ def delete_group():
         if group.delete_group():
             data["flag"] = True
             data["message"] = "groupDeletedSuccessfully"
-            return data
+            return json.dumps(data)
         else:
             data["flag"] = False
             data["message"] = "failedToDeleteGroup"
-            return data
-    return data
+            return json.dumps(data)
+    return json.dumps(data)
 
 
 @bp.route("/update", methods=("GET", "POST"))
@@ -74,12 +78,40 @@ def update():
                 data[
                     "message"
                 ] = "The number of group leaders in the group reaches the upper limit"
-                return data
+                return json.dumps(data)
             group.add_employee(int(leader), True)
         data["flag"] = True
         data["message"] = "successfullyUpdateGroup"
-        return data
-    return data
+        return json.dumps(data)
+    return json.dumps(data)
+
+
+@bp.route("/getList", methods=("GET", "POST"))
+def get_all_group():
+    data = {
+        "resultTotal": 0,
+        "resultList": None
+    }
+    if request.method == "POST":
+        rev_data = json.loads(request.form["data"])
+        page, size, search_key = rev_data["page"], rev_data["size"], rev_data["searchKey"]
+        if search_key == "":
+            group_list = db.get_all_group()
+            start = (page - 1) * size
+            end = page * size if page * size <= len(group_list) else len(group_list)
+            data = {
+                "resultTotal": len(db.get_all_group()),
+                "resultList": group_list[start:end]
+            }
+            return json.dumps(data)
+        else:
+            group = db.GroupInfo(search_key)
+            if group.is_exist():
+                data = {
+                    "resultTotal": 1,
+                    "resultList": group.get_group_dict()
+                }
+            return json.dumps(data)
 
 
 if __name__ == "__main__":

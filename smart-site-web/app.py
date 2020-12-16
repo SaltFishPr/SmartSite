@@ -4,7 +4,7 @@
 # @date: 2020/12/13
 from flask import Flask
 
-from routes import auth, contract, employee
+from routes import auth, contract, employee, group
 from flask_cors import *
 
 
@@ -24,6 +24,7 @@ def create_app(test_config=None):
     app.register_blueprint(auth.bp)  # 注册认证蓝图
     app.register_blueprint(contract.bp)  # 注册合同蓝图
     app.register_blueprint(employee.bp)  # 注册员工蓝图
+    app.register_blueprint(group.bp)  # 注册员工蓝图
 
     @app.route("/")
     def index():

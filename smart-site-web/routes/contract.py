@@ -9,7 +9,7 @@ import db
 bp = Blueprint("contract", __name__, url_prefix="/contract")
 
 
-@bp.route("/getList", methods="POST")
+@bp.route("/getList", methods=("POST",))
 def get_client_contract():
     if request.method == "POST":
         data = json.loads(request.form["data"])

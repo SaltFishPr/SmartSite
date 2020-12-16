@@ -138,14 +138,14 @@ class ProjectInfo:
         return False
 
     def insert(
-        self,
-        client_id: int,
-        check_system_id: int,
-        project_status,
-        project_risk_value,
-        project_creation_time,
-        project_description,
-        project_manager,
+            self,
+            client_id: int,
+            check_system_id: int,
+            project_status,
+            project_risk_value,
+            project_creation_time,
+            project_description,
+            project_manager,
     ) -> bool:
         """
         插入该项目信息
@@ -213,12 +213,12 @@ class CheckInfo:
         return False
 
     def insert(
-        self,
-        project_id: int,
-        check_system_lv_1: int,
-        check_system_lv_2: int,
-        employee_id: int,
-        problem_description: str,
+            self,
+            project_id: int,
+            check_system_lv_1: int,
+            check_system_lv_2: int,
+            employee_id: int,
+            problem_description: str,
     ) -> bool:
         """
         插入一个检查条目
@@ -491,6 +491,29 @@ class GroupInfo:
         """得到组长的数量"""
         return int(self.__r.hget(self.__group_key, "leader_num"))
 
+    def get_group_dict(self):
+        """
+        获取改组内的数据字典
+        return 数据字典{"groupID":int,"groupMember":list,"groupLeader":list}
+        """
+        res = {}
+        group_member = []
+        group_leader = []
+        data = self.__r.hgetall(self.__group_key)
+        for k, v in data.items():
+            if k == "leader_num":
+                continue
+            if json.loads(v)["is_leader"]:
+                group_leader.append(k)
+            else:
+                group_member.append(k)
+        res = {
+            "groupID": self.__group_id,
+            "groupMember": "-".join(group_member),
+            "groupLeader": "-".join(group_leader)
+        }
+        return res
+
 
 def get_all_employees():
     r = redis.Redis(connection_pool=pool)
@@ -511,4 +534,23 @@ def get_all_contracts():
     for contract in contracts:
         tmp = ClientContractInfo(key_to_id(contract))
         res.append(tmp.get())
+    return res
+
+
+def get_all_group():
+    r = redis.Redis(connection_pool=pool)
+    contracts = r.keys(pattern="GroupInfo:*")
+    r.close()
+    res = []
+    for contract in contracts:
+        group_id = key_to_id(contract)
+        tmp = GroupInfo(group_id)
+        group_member = []
+        group_leader = []
+        for tmp_group in tmp.get_all():
+            if tmp_group[1] is True:
+                group_leader.append(str(tmp_group[0]))
+            else:
+                group_member.append(str(tmp_group[0]))
+        res.append({"groupId": group_id, "groupMember": "-".join(group_member), "groupLeader": "-".join(group_leader)})
     return res
