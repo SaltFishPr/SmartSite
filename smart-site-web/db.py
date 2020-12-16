@@ -6,7 +6,7 @@ import json
 import redis
 from typing import List
 
-from utils import id_to_key, key_to_id
+from utils import id_to_key, key_to_id, random_id
 
 pool = redis.ConnectionPool(host="localhost", port=6379, decode_responses=True)
 
@@ -63,9 +63,9 @@ class AdministratorInfo:
         return json.loads(self.__r.get(self.__administrator_key))
 
 
-class ClientContractInfo:
+class ClientInfo:
     """
-    委托方合同信息表：委托方ID、委托方描述等
+    委托方合同信息表：委托方ID、委托方名称、委托方描述等
     """
 
     def __init__(self, client_id):
@@ -73,7 +73,7 @@ class ClientContractInfo:
         初始化该委托合同
         :param client_id: 委托方ID
         """
-        self.__table_name = "ClientContractInfo"  # 表名
+        self.__table_name = "ClientInfo"  # 表名
         self.__client_id = client_id
         self.__client_key = id_to_key(self.__table_name, client_id)
         self.__r = redis.Redis(connection_pool=pool)
@@ -86,18 +86,32 @@ class ClientContractInfo:
             return True
         return False
 
-    def insert(self, client_description: str) -> bool:
+    def insert(self, client_name, client_description: str) -> bool:
         """
-        插入该委托合同信息
-        :param client_description: 委托人描述
+        插入该委托方信息
+        :param client_name: 委托方名称
+        :param client_description: 委托方描述
         :return: 成功插入返回True，否则返回False
         """
-        data = [self.__client_id, client_description]
+        data = [self.__client_id, client_name, client_description]
         return self.__r.setnx(self.__client_key, json.dumps(data))
+
+    def update(self, client_name, client_description) -> bool:
+        """
+        插入该委托方信息
+        :param client_name: 委托方名称
+        :param client_description: 委托方描述
+        :return: 成功插入返回True，否则返回False
+        """
+        data = [self.__client_id, client_name, client_description]
+        if not self.is_exist():
+            return False
+        self.__r.set(self.__client_key, json.dumps(data))
+        return True
 
     def delete(self) -> bool:
         """
-        删除该委托合同信息
+        删除该委托方信息
         :return: 成功删除返回True，否则返回False
         """
         if self.__r.delete(self.__client_key) == 1:
@@ -107,11 +121,74 @@ class ClientContractInfo:
     def get(self) -> List:
         """
         获取该委托人信息
-        :return: [委托方ID, 委托人描述]
+        :return: [委托方ID, 委托方名称, 委托方描述]
         """
         if not self.is_exist():
             return []
         return json.loads(self.__r.get(self.__client_key))
+
+
+class ContractInfo:
+    """
+    合同信息表：合同ID、合同内容、合同创建日期、委托方ID
+    """
+
+    def __init__(self):
+        """
+        初始化该合同
+        """
+        self.__table_name = "ContractInfo"  # 表名
+        self.__contract_id = random_id()
+        self.__contract_key = id_to_key(self.__table_name, self.__contract_id)
+        while self.is_exist():
+            self.__contract_id = random_id()
+            self.__contract_key = id_to_key(self.__table_name, self.__contract_id)
+        self.__r = redis.Redis(connection_pool=pool)
+
+    def __del__(self):
+        self.__r.close()
+
+    def is_exist(self) -> bool:
+        if self.__r.exists(self.__contract_key) == 1:
+            return True
+        return False
+
+    def insert(self, contract_content, contract_creation_date, client_id) -> bool:
+        """
+        插入合同信息
+        :param contract_content:
+        :param contract_creation_date:
+        :param client_id:
+        :return:
+        """
+        data = [self.__contract_id, contract_content, contract_creation_date, client_id]
+        return self.__r.setnx(self.__contract_key, json.dumps(data))
+
+    def update(self, contract_content, contract_creation_date, client_id) -> bool:
+
+        data = [self.__contract_id, contract_content, contract_creation_date, client_id]
+        if not self.is_exist():
+            return False
+        self.__r.set(self.__contract_key, json.dumps(data))
+        return True
+
+    def delete(self) -> bool:
+        """
+        删除该委托方信息
+        :return: 成功删除返回True，否则返回False
+        """
+        if self.__r.delete(self.__contract_key) == 1:
+            return True
+        return False
+
+    def get(self) -> List:
+        """
+        获取该委托人信息
+        :return: [委托方ID, 委托方名称, 委托方描述]
+        """
+        if not self.is_exist():
+            return []
+        return json.loads(self.__r.get(self.__contract_key))
 
 
 class ProjectInfo:
@@ -119,14 +196,14 @@ class ProjectInfo:
     项目信息表：项目ID、委托方ID、检查体系ID、项目状态、项目风险值、项目创建时间、项目描述、项目负责人等
     """
 
-    def __init__(self, project_id):
-        """
-        初始化该项目信息
-        :param project_id: 项目ID
-        """
+    def __init__(self):
+        """初始化该项目信息"""
         self.__table_name = "ProjectInfo"  # 表名
-        self.__project_id = project_id
-        self.__project_key = id_to_key(self.__table_name, project_id)
+        self.__project_id = random_id()
+        self.__project_key = id_to_key(self.__table_name, self.__project_id)
+        while self.is_exist():
+            self.__project_id = random_id()
+            self.__project_key = id_to_key(self.__table_name, self.__project_id)
         self.__r = redis.Redis(connection_pool=pool)
 
     def __del__(self):
@@ -138,14 +215,14 @@ class ProjectInfo:
         return False
 
     def insert(
-            self,
-            client_id: int,
-            check_system_id: int,
-            project_status,
-            project_risk_value,
-            project_creation_time,
-            project_description,
-            project_manager,
+        self,
+        client_id: int,
+        check_system_id: int,
+        project_status,
+        project_risk_value,
+        project_creation_time,
+        project_description,
+        project_manager,
     ) -> bool:
         """
         插入该项目信息
@@ -172,7 +249,7 @@ class ProjectInfo:
 
     def delete(self) -> bool:
         """
-        删除该委托人信息
+        删除项目信息
         :return: 成功删除返回True，否则返回False
         """
         if self.__r.delete(self.__project_key) == 1:
@@ -181,7 +258,7 @@ class ProjectInfo:
 
     def get(self) -> List:
         """
-        获取该委托人信息
+        获取项目信息
         :return: [项目 ID, 委托方 ID, 检查体系 ID, 项目状态, 项目风险值, 项目创建时间, 项目描述, 项目负责人]
         """
         if not self.is_exist():
@@ -213,12 +290,12 @@ class CheckInfo:
         return False
 
     def insert(
-            self,
-            project_id: int,
-            check_system_lv_1: int,
-            check_system_lv_2: int,
-            employee_id: int,
-            problem_description: str,
+        self,
+        project_id: int,
+        check_system_lv_1: int,
+        check_system_lv_2: int,
+        employee_id: int,
+        problem_description: str,
     ) -> bool:
         """
         插入一个检查条目
@@ -510,7 +587,7 @@ class GroupInfo:
         res = {
             "groupID": self.__group_id,
             "groupMember": "-".join(group_member),
-            "groupLeader": "-".join(group_leader)
+            "groupLeader": "-".join(group_leader),
         }
         return res
 
@@ -532,7 +609,7 @@ def get_all_contracts():
     r.close()
     res = []
     for contract in contracts:
-        tmp = ClientContractInfo(key_to_id(contract))
+        tmp = ClientInfo(key_to_id(contract))
         res.append(tmp.get())
     return res
 
@@ -552,5 +629,11 @@ def get_all_group():
                 group_leader.append(str(tmp_group[0]))
             else:
                 group_member.append(str(tmp_group[0]))
-        res.append({"groupId": group_id, "groupMember": "-".join(group_member), "groupLeader": "-".join(group_leader)})
+        res.append(
+            {
+                "groupId": group_id,
+                "groupMember": "-".join(group_member),
+                "groupLeader": "-".join(group_leader),
+            }
+        )
     return res
