@@ -270,9 +270,9 @@ export default {
             alert(data.message);
             this.groupListGet();
           })
-          .catch(({ data }) => {
+          .catch(() => {
             this.submitLoading = false;
-            alert(data.message);
+            alert("失败");
           });
       } else {
         //新增小组
@@ -291,9 +291,9 @@ export default {
             alert(data.message);
             this.groupListGet();
           })
-          .catch(({ data }) => {
+          .catch(() => {
             this.submitLoading = false;
-            alert(data.message);
+            alert("失败");
           });
       }
     },

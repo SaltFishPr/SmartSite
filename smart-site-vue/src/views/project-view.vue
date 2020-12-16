@@ -375,9 +375,9 @@ export default {
             alert(data.message);
             this.employeeListGet();
           })
-          .catch(({ data }) => {
+          .catch(() => {
             this.submitLoading = false;
-            alert(data.message);
+            alert("失败");
           });
       } else {
         //新增合约
@@ -401,9 +401,9 @@ export default {
             alert(data.message);
             this.employeeListGet();
           })
-          .catch(({ data }) => {
+          .catch(() => {
             this.submitLoading = false;
-            alert(data.message);
+            alert("失败");
           });
       }
     },
