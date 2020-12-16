@@ -631,8 +631,8 @@ class GroupInfo:
 
     def get_group_dict(self):
         """
-        获取改组内的数据字典
-        :return: 数据字典{"groupID":int,"groupMember":list,"groupLeader":list}
+        获取改组内的数据字典列表
+        :return: [{"groupID":int,"groupMember":list,"groupLeader":list}]
         """
         res = []
         group_member = []
@@ -645,11 +645,13 @@ class GroupInfo:
                 group_leader.append(k)
             else:
                 group_member.append(k)
-        res.append({
-            "groupId": self.__group_id,
-            "groupMember": "-".join(group_member),
-            "groupLeader": "-".join(group_leader),
-        })
+        res.append(
+            {
+                "groupId": self.__group_id,
+                "groupMember": "-".join(group_member),
+                "groupLeader": "-".join(group_leader),
+            }
+        )
         return res
 
 
