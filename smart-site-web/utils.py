@@ -6,7 +6,7 @@ import random
 import string
 
 
-def id_to_key(table_name: str, iid: int) -> str:
+def id_to_key(table_name: str, iid) -> str:
     return table_name + ":" + str(iid)
 
 

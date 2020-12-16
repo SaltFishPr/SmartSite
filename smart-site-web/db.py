@@ -6,9 +6,13 @@ import json
 import redis
 from typing import List
 
+import config
 from utils import id_to_key, key_to_id, random_id
 
-pool = redis.ConnectionPool(host="localhost", port=6379, decode_responses=True)
+# decode_responses设置取出为字符串
+pool = redis.ConnectionPool(
+    host=config.redis_host, port=config.redis_port, decode_responses=True
+)
 
 
 class AdministratorInfo:
@@ -23,8 +27,8 @@ class AdministratorInfo:
         """
         self.__table_name = "ClientContractInfo"  # 表名
         self.__administrator_username = administrator_username
-        self.__administrator_key = f"{self.__table_name}:{administrator_username}"
-        self.__r = redis.Redis(connection_pool=pool)
+        self.__administrator_key = id_to_key(self.__table_name, administrator_username)
+        self.__r = redis.Redis(connection_pool=pool, password=config.redis_password)
 
     def __del__(self):
         self.__r.close()
@@ -76,7 +80,7 @@ class ClientInfo:
         self.__table_name = "ClientInfo"  # 表名
         self.__client_id = client_id
         self.__client_key = id_to_key(self.__table_name, client_id)
-        self.__r = redis.Redis(connection_pool=pool)
+        self.__r = redis.Redis(connection_pool=pool, password=config.redis_password)
 
     def __del__(self):
         self.__r.close()
@@ -143,7 +147,7 @@ class ContractInfo:
         while self.is_exist():
             self.__contract_id = random_id()
             self.__contract_key = id_to_key(self.__table_name, self.__contract_id)
-        self.__r = redis.Redis(connection_pool=pool)
+        self.__r = redis.Redis(connection_pool=pool, password=config.redis_password)
 
     def __del__(self):
         self.__r.close()
@@ -204,7 +208,7 @@ class ProjectInfo:
         while self.is_exist():
             self.__project_id = random_id()
             self.__project_key = id_to_key(self.__table_name, self.__project_id)
-        self.__r = redis.Redis(connection_pool=pool)
+        self.__r = redis.Redis(connection_pool=pool, password=config.redis_password)
 
     def __del__(self):
         self.__r.close()
@@ -279,7 +283,7 @@ class CheckInfo:
         self.__table_name = "CheckInfo"  # 表名
         self.__check_id = check_id
         self.__check_key = id_to_key(self.__table_name, check_id)
-        self.__r = redis.Redis(connection_pool=pool)
+        self.__r = redis.Redis(connection_pool=pool, password=config.redis_password)
 
     def __del__(self):
         self.__r.close()
@@ -344,7 +348,7 @@ class CheckSystemInfo:
         self.__table_name = "CheckSystemInfo"  # 表名
         self.__check_system_id = check_system_id
         self.__check_system_key = id_to_key(self.__table_name, check_system_id)
-        self.__r = redis.Redis(connection_pool=pool)
+        self.__r = redis.Redis(connection_pool=pool, password=config.redis_password)
 
     def __del__(self):
         self.__r.close()
@@ -396,7 +400,7 @@ class EmployeeInfo:
         self.__table_name = "EmployeeInfo"  # 表名
         self.__employee_id = employee_id
         self.__employee_key = id_to_key(self.__table_name, employee_id)
-        self.__r = redis.Redis(connection_pool=pool)
+        self.__r = redis.Redis(connection_pool=pool, password=config.redis_password)
 
     def __del__(self):
         self.__r.close()
@@ -476,7 +480,7 @@ class GroupInfo:
         self.__table_name = "GroupInfo"  # 表名
         self.__group_id = group_id
         self.__group_key = id_to_key(self.__table_name, group_id)
-        self.__r = redis.Redis(connection_pool=pool)
+        self.__r = redis.Redis(connection_pool=pool, password=config.redis_password)
 
     def __del__(self):
         self.__r.close()
@@ -571,7 +575,7 @@ class GroupInfo:
     def get_group_dict(self):
         """
         获取改组内的数据字典
-        return 数据字典{"groupID":int,"groupMember":list,"groupLeader":list}
+        :return: 数据字典{"groupID":int,"groupMember":list,"groupLeader":list}
         """
         res = {}
         group_member = []
@@ -593,7 +597,7 @@ class GroupInfo:
 
 
 def get_all_employees():
-    r = redis.Redis(connection_pool=pool)
+    r = redis.Redis(connection_pool=pool, password=config.redis_password)
     employees = r.keys(pattern="EmployeeInfo:*")
     r.close()
     res = []
@@ -604,7 +608,7 @@ def get_all_employees():
 
 
 def get_all_contracts():
-    r = redis.Redis(connection_pool=pool)
+    r = redis.Redis(connection_pool=pool, password=config.redis_password)
     contracts = r.keys(pattern="ClientContractInfo:*")
     r.close()
     res = []
@@ -615,7 +619,7 @@ def get_all_contracts():
 
 
 def get_all_group():
-    r = redis.Redis(connection_pool=pool)
+    r = redis.Redis(connection_pool=pool, password=config.redis_password)
     contracts = r.keys(pattern="GroupInfo:*")
     r.close()
     res = []
