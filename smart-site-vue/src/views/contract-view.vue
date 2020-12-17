@@ -338,7 +338,7 @@ export default {
           }).then(({ data }) => {
             console.log(data);
             alert(data.message);
-            this.groupListGet();
+            this.contractListGet();
           });
         })
         .catch(() => {
