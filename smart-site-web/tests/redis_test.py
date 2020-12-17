@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 # @file: redis_test.py
 # @date: 2020/12/15
-import redis
 import db
 
 if __name__ == "__main__":

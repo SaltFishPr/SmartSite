@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 # @file: client.py
 # @date: 2020/12/16
-from flask import Blueprint, request
 import json
+
+from flask import Blueprint, request
 
 import db
 from utils import page_size_convert
