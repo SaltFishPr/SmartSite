@@ -336,8 +336,8 @@ export default {
       setTimeout(() => (this.tableLoading = false), 200);
       this.clientList = [
         {
-          clientId: 1, //合同编号
-          clientName: 1, //委托方ID
+          clientId: 1, //委托方ID
+          clientName: 1, //委托方名称
           clientDescription: "合同描述1", //委托方描述
         },
         {

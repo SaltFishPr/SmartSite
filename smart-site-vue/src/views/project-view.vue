@@ -413,8 +413,6 @@ export default {
         projectCheckSystemID: "", //检查体系ID
         projectDescription: "", //项目描述
         projectCreationTime: "", //项目创建时间
-        // projectCheckGroupLeader: "", //项目状态
-        // projectCheckGroupMember: "", //项目状态
         projectCheckGroupId: "",
       };
       this.selectAction = 0; //新增合约
