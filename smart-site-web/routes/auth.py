@@ -27,21 +27,21 @@ bp = Blueprint("auth", __name__, url_prefix="/auth")  # url_prefix 会添加到�
 @bp.route("/register", methods=("GET", "POST"))
 def register():
     if request.method == "POST":
-        username = request.form["username"]
+        account = request.form["account"]
         password = request.form["password"]
-        description = request.form["description"]
-        user_info = db.AdministratorInfo(username)
+        identity = request.form["identity"]
+        table = db.UserInfo()
         error = None
 
-        if not username:
+        if not account:
             error = "Username is required."
         elif not password:
             error = "Password is required."
-        elif user_info.is_exist():
-            error = "User {} is already registered.".format(username)
+        elif table.is_exist(account):
+            error = "User {} is already registered.".format(account)
 
         if error is None:
-            user_info.insert(password, description)
+            table.insert(account, password, identity)
             return redirect(url_for("auth.login"))
 
         flash(error)  # 用于储存在渲染模块时可以调用的信息
@@ -56,17 +56,21 @@ def login():
     :return:
     """
     if request.method == "POST":
-        username = request.form["username"]
+        account = request.form["account"]
         password = request.form["password"]
-        user_info = db.AdministratorInfo(username)
+        table = db.UserInfo()
         error = None
-        user = user_info.get()
-        if not user_info.is_exist() or user == [] or user[1] != password:
+        user = table.get(account)
+
+        if not table.is_exist(account) or user == [] or user[1] != password:
             error = "Incorrect username or password."
+
+        if user[2] != "admin":
+            error = "Non administrator account"
 
         if error is None:
             session.clear()
-            session["user_id"] = user[0]
+            session["account"] = user[0]
             return redirect(url_for("index"))
 
         flash(error)
@@ -81,12 +85,12 @@ def load_logged_in_user():
     g.user 的持续时间比请求要长。如果没有用户 id ，或者 id 不存在，那么 g.user 将会是 None 。
     :return: Nothing
     """
-    user_id = session.get("user_id")
+    account = session.get("account")
 
-    if user_id is None:
+    if account is None:
         g.user = None
     else:
-        g.user = db.AdministratorInfo(user_id).get()
+        g.user = db.UserInfo().get(account)
 
 
 @bp.route("/logout")
@@ -96,11 +100,7 @@ def logout():
 
 
 def login_required(view):
-    """
-    装饰器 用于身份验证
-    :param view:
-    :return:
-    """
+    """装饰器 用于身份验证"""
 
     @functools.wraps(view)
     def wrapped_view(**kwargs):
