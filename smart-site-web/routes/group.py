@@ -58,7 +58,7 @@ def delete_group():
 
 
 @bp.route("/update", methods=("GET", "POST"))
-def update():
+def update_group():
     data = {"flag": False, "message": "未执行更新小组"}
     if request.method == "POST":
 
@@ -87,7 +87,7 @@ def update():
 
 
 @bp.route("/getList", methods=("GET", "POST"))
-def get_all_group():
+def get_all_groups():
     if request.method == "POST":
         rev_data = json.loads(request.form["data"])
         page, size, search_key = (

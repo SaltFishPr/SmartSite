@@ -30,61 +30,55 @@ class UserInfo:
     def __del__(self):
         self.__r.close()
 
-    def is_exist(self, administrator_username: str) -> bool:
-        if self.__r.exists(id_to_key(self.__table_name, administrator_username)) == 1:
+    def is_exist(self, account: str) -> bool:
+        if self.__r.exists(id_to_key(self.__table_name, account)) == 1:
             return True
         return False
 
-    def insert(self, administrator_username: str, password: str, identity: str) -> bool:
+    def insert(self, account: str, password: str, identity: str) -> bool:
         """
         插入用户信息
-        :param administrator_username: 用户名
+        :param account: 用户名
         :param password: 密码
         :param identity: 用户身份
         :return: 成功返回 True，否则返回 False
         """
-        data = [administrator_username, password, identity]
-        return self.__r.setnx(
-            id_to_key(self.__table_name, administrator_username), json.dumps(data)
-        )
+        data = [account, password, identity]
+        return self.__r.setnx(id_to_key(self.__table_name, account), json.dumps(data))
 
-    def update(self, administrator_username: str, password: str, identity: str) -> bool:
+    def update(self, account: str, password: str, identity: str) -> bool:
         """
         更新用户信息
-        :param administrator_username: 用户名
+        :param account: 用户名
         :param password: 密码
         :param identity: 用户身份
         :return: 成功返回 True，否则返回 False
         """
-        data = [administrator_username, password, identity]
-        if not self.is_exist(administrator_username):
+        data = [account, password, identity]
+        if not self.is_exist(account):
             return False
-        self.__r.set(
-            id_to_key(self.__table_name, administrator_username), json.dumps(data)
-        )
+        self.__r.set(id_to_key(self.__table_name, account), json.dumps(data))
         return True
 
-    def delete(self, administrator_username: str) -> bool:
+    def delete(self, account: str) -> bool:
         """
         删除用户信息
-        :param administrator_username: 用户名
+        :param account: 用户名
         :return: 成功返回 True，否则返回 False
         """
-        if self.__r.delete(id_to_key(self.__table_name, administrator_username)) == 1:
+        if self.__r.delete(id_to_key(self.__table_name, account)) == 1:
             return True
         return False
 
-    def get(self, administrator_username: str) -> List:
+    def get(self, account: str) -> List:
         """
         获取用户信息
-        :param administrator_username: 用户名
+        :param account: 用户名
         :return: [用户名, 密码, 用户身份]
         """
-        if not self.is_exist(administrator_username):
+        if not self.is_exist(account):
             return []
-        return json.loads(
-            self.__r.get(id_to_key(self.__table_name, administrator_username))
-        )
+        return json.loads(self.__r.get(id_to_key(self.__table_name, account)))
 
 
 class ClientInfo:
@@ -188,9 +182,9 @@ class ProjectInfo:
         check_system_id: str,
         project_status: str,
         project_risk_value: int,
-        project_creation_time: str,
         project_description: str,
         project_manager: str,
+        project_check_group_id: str,
     ) -> bool:
         """
         插入项目信息
@@ -198,9 +192,9 @@ class ProjectInfo:
         :param check_system_id: 检查体系 ID
         :param project_status: 项目状态
         :param project_risk_value: 项目风险值
-        :param project_creation_time: 项目创建时间
         :param project_description: 项目描述
         :param project_manager: 项目负责人
+        :param project_check_group_id: 检查小组ID
         :return: 成功返回 True，否则返回 False
         """
         project_id = random_id()  # 生成项目ID
@@ -213,13 +207,55 @@ class ProjectInfo:
             check_system_id,
             project_status,
             project_risk_value,
-            project_creation_time,
+            time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),  # 项目创建时间
             project_description,
             project_manager,
+            project_check_group_id,
         ]
         return self.__r.setnx(
             id_to_key(self.__table_name, project_id), json.dumps(data)
         )
+
+    def update(
+        self,
+        project_id,
+        client_id,
+        check_system_id,
+        project_status,
+        project_risk_value,
+        creation_time,
+        project_description,
+        project_manager,
+        project_check_group_id,
+    ):
+        """
+        更新合同信息
+        :param project_id: 项目ID
+        :param client_id: 委托方ID
+        :param check_system_id: 检查体系ID
+        :param project_status: 项目状态
+        :param project_risk_value: 项目风险值
+        :param creation_time: 项目创建时间
+        :param project_description: 项目描述
+        :param project_manager: 项目管理人
+        :param project_check_group_id: 检查小组ID
+        :return: 成功返回 True，否则返回 False
+        """
+        data = [
+            project_id,
+            client_id,
+            check_system_id,
+            project_status,
+            project_risk_value,
+            creation_time,
+            project_description,
+            project_manager,
+            project_check_group_id,
+        ]
+        if not self.is_exist(project_id):
+            return False
+        self.__r.set(id_to_key(self.__table_name, project_id), json.dumps(data))
+        return True
 
     def delete(self, project_id: str) -> bool:
         """
@@ -248,10 +284,15 @@ class ProjectInfo:
             data = self.get(key_to_id(project))
             res.append(
                 {
-                    # TODO: 项目信息
-                    "clientId": data[0],
-                    "clientName": data[1],
-                    "clientDescription": data[2],
+                    "projectId": data[0],
+                    "clientId": data[1],
+                    "projectCheckSystemID": data[2],
+                    "projectStatus": data[3],
+                    "projectRiskValue": data[4],
+                    "projectCreationTime": data[5],
+                    "projectDescription": data[6],
+                    "projectManager": data[7],
+                    "projectCheckGroupId": data[8],
                 }
             )
         return res

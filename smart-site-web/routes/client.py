@@ -27,7 +27,7 @@ def get_all_clients():
 
 
 @bp.route("/create", methods=("POST",))
-def create_employee():
+def create_client():
     data = json.loads(request.form["data"])
     table = db.ClientInfo()
     if table.insert(data["clientName"], data["clientDescription"]):
@@ -36,7 +36,7 @@ def create_employee():
 
 
 @bp.route("/delete", methods=("POST",))
-def delete_employee():
+def delete_client():
     data = json.loads(request.form["data"])
     table = db.ClientInfo()
     if table.delete(data["clientId"]):
@@ -45,7 +45,7 @@ def delete_employee():
 
 
 @bp.route("/update", methods=("POST",))
-def update_employee():
+def update_client():
     data = json.loads(request.form["data"])
     table = db.ClientInfo()
     if table.update(data["clientId"], data["clientName"], data["clientDescription"]):
