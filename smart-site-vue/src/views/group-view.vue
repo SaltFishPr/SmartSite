@@ -97,12 +97,51 @@
       <template v-slot>
         <vxe-form
           :data="group"
-          :items="formItems"
           :rules="formRules"
           title-align="right"
           title-wIdth="100"
           @submit="submitEvent"
-        ></vxe-form>
+        >
+          <vxe-form-item
+            title="小组编号"
+            field="groupId"
+            span="24"
+            :visible="selectAction"
+          >
+            <template v-slot>
+              <vxe-input
+                v-model="group.groupId"
+                placeholder="请输入小组编号"
+                :disabled="selectAction"
+                clearable
+              ></vxe-input>
+            </template>
+          </vxe-form-item>
+          <vxe-form-item title="小组组长" field="groupMember" span="24">
+            <template v-slot>
+              <vxe-input
+                v-model="group.groupMember"
+                placeholder="请输入小组组长"
+                clearable
+              ></vxe-input>
+            </template>
+          </vxe-form-item>
+          <vxe-form-item title="小组成员" field="groupLeader" span="24">
+            <template v-slot>
+              <vxe-input
+                v-model="group.groupLeader"
+                placeholder="请输入小组成员"
+                clearable
+              ></vxe-input>
+            </template>
+          </vxe-form-item>
+
+          <vxe-form-item align="center" span="24" titleAlign="left">
+            <template v-slot>
+              <vxe-button type="submit" status="primary">提交</vxe-button>
+            </template>
+          </vxe-form-item>
+        </vxe-form>
       </template>
     </vxe-modal>
   </div>
@@ -115,7 +154,7 @@ export default {
     return {
       submitLoading: false, //提交动画
       tableLoading: false,
-      selectAction: 0, //新增0or编辑1
+      selectAction: false, //新增0or编辑1
       showEdit: false, //编辑框
       groupList: [], //小组列表
       groupPage: {
@@ -136,68 +175,22 @@ export default {
       },
       formRules: {
         //表单规则
-        groupId: [{ required: true, message: "请输入小组编号" }],
+
         groupLeader: [
           { required: true, message: "请输入小组组长" },
           {
             pattern: /^\d+(-\d*){0,2}$/,
-            message: "请输入员工编号-员工编号-员工编号进行输入",
+            message: "请按员工编号-员工编号-员工编号进行输入",
           },
         ],
         groupMember: [
           { required: true, message: "请输入小组组员" },
           {
             pattern: /^\d+(-\d*){0,2}$/,
-            message: "请输入员工编号-员工编号-员工编号进行输入",
+            message: "请按员工编号-员工编号-员工编号进行输入",
           },
         ],
       },
-      formItems: [
-        //表单项
-        {
-          title: "Basic information",
-          span: 24,
-          titleAlign: "left",
-          titleWIdth: 200,
-          titlePrefix: { icon: "fa fa-address-card-o" },
-        },
-        {
-          field: "groupId",
-          title: "小组编号",
-          span: 24,
-          itemRender: {
-            name: "$input",
-            props: { placeholder: "请输入小组编号" },
-          },
-        },
-        {
-          field: "groupLeader",
-          title: "小组组长",
-          span: 24,
-          itemRender: {
-            name: "$input",
-            props: { placeholder: "请输入小组组长" },
-          },
-        },
-        {
-          field: "groupMember",
-          title: "小组组员",
-          span: 24,
-          itemRender: {
-            name: "$input",
-            props: { placeholder: "请输入小组组员" },
-          },
-        },
-        {
-          align: "center",
-          span: 24,
-          titleAlign: "left",
-          itemRender: {
-            name: "$button",
-            props: { type: "submit", content: "提交", status: "primary" },
-          },
-        },
-      ],
     };
   },
 
@@ -276,7 +269,6 @@ export default {
         service({
           url: "/group/create",
           data: {
-            groupId: this.group.groupId,
             groupLeader: this.group.groupLeader,
             groupMember: this.group.groupMember,
           },
@@ -301,7 +293,7 @@ export default {
         groupLeader: "", //合同编号
         groupMember: "", //合同编号
       };
-      this.selectAction = 0; //新增小组
+      this.selectAction = false; //新增小组
       this.showEdit = true; //显示编辑框
     },
     groupEdit(row) {
@@ -311,7 +303,7 @@ export default {
         groupLeader: row.groupLeader,
         groupMember: row.groupMember,
       };
-      this.selectAction = 1; //编辑小组
+      this.selectAction = true; //编辑小组
       this.showEdit = true; //显示编辑框
     },
     groupDelete(row) {

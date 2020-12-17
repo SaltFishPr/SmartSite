@@ -49,6 +49,11 @@
         field="employeeName"
         title="员工姓名"
       ></vxe-table-column>
+      <vxe-table-column field="employeeAge" title="员工年龄"></vxe-table-column>
+      <vxe-table-column
+        field="employeeGroup"
+        title="员工组别"
+      ></vxe-table-column>
 
       <vxe-table-column title="操作" width="100" show-overflow>
         <template v-slot="{ row }">
@@ -101,12 +106,71 @@
       <template v-slot>
         <vxe-form
           :data="employee"
-          :items="formItems"
           :rules="formRules"
           title-align="right"
           title-width="100"
           @submit="submitEvent"
-        ></vxe-form>
+        >
+          <vxe-form-item
+            title="员工编号"
+            field="employeeId"
+            span="24"
+            :visible="selectAction"
+          >
+            <template v-slot>
+              <vxe-input
+                v-model="employee.employeeId"
+                placeholder="请输入员工编号"
+                :disabled="selectAction"
+                clearable
+              ></vxe-input>
+            </template>
+          </vxe-form-item>
+
+          <vxe-form-item title="员工姓名" field="employeeName" span="24">
+            <template v-slot>
+              <vxe-input
+                v-model="employee.employeeName"
+                placeholder="请输入员工姓名"
+                :disabled="selectAction"
+                clearable
+              ></vxe-input>
+            </template>
+          </vxe-form-item>
+
+          <vxe-form-item title="年龄" field="employeeAge" span="24">
+            <template v-slot>
+              <vxe-input
+                v-model="employee.employeeAge"
+                placeholder="请输入年龄"
+                :disabled="selectAction"
+                clearable
+              ></vxe-input>
+            </template>
+          </vxe-form-item>
+
+          <vxe-form-item
+            title="员工组别"
+            field="employeeGroup"
+            span="24"
+            :visible="selectAction"
+          >
+            <template v-slot>
+              <vxe-input
+                v-model="employee.employeeGroup"
+                placeholder="请输入员工组别"
+                :disabled="selectAction"
+                clearable
+              ></vxe-input>
+            </template>
+          </vxe-form-item>
+
+          <vxe-form-item align="center" span="24" titleAlign="left">
+            <template v-slot>
+              <vxe-button type="submit" status="primary">提交</vxe-button>
+            </template>
+          </vxe-form-item></vxe-form
+        >
       </template>
     </vxe-modal>
   </div>
@@ -119,7 +183,7 @@ export default {
     return {
       submitLoading: false, //提交动画
       tableLoading: false,
-      selectAction: 0, //新增0or编辑1
+      selectAction: false, //新增0or编辑1
       showEdit: false, //编辑框
       employeeList: [], //员工列表
       employeePage: {
@@ -136,59 +200,14 @@ export default {
         //员工
         employeeId: null,
         employeeName: null,
-        employeeGuoup: null,
+        employeeAge: null,
+        employeeGroup: null,
       },
       formRules: {
         //表单规则
         employeeId: [{ required: true, message: "请输入员工编号" }],
         employeeName: [{ required: true, message: "请输入员工姓名" }],
       },
-      formItems: [
-        //表单项
-        {
-          title: "Basic information",
-          span: 24,
-          titleAlign: "left",
-          titleWidth: 200,
-          titlePrefix: { icon: "fa fa-address-card-o" },
-        },
-        {
-          field: "employeeId",
-          title: "员工编号",
-          span: 24,
-          itemRender: {
-            name: "$input",
-            props: { placeholder: "请输入员工编号" },
-          },
-        },
-        {
-          field: "employeeName",
-          title: "员工姓名",
-          span: 24,
-          itemRender: {
-            name: "$input",
-            props: { placeholder: "请输入员工姓名" },
-          },
-        },
-        {
-          field: "employeeGroup",
-          title: "员工组别",
-          span: 24,
-          itemRender: {
-            name: "$input",
-            props: { placeholder: "请输入员工组别" },
-          },
-        },
-        {
-          align: "center",
-          span: 24,
-          titleAlign: "left",
-          itemRender: {
-            name: "$button",
-            props: { type: "submit", content: "提交", status: "primary" },
-          },
-        },
-      ],
     };
   },
 
@@ -247,7 +266,7 @@ export default {
           data: {
             employeeId: this.employee.employeeId,
             employeeName: this.employee.employeeName,
-            employeeGroup: this.employee.employeeGroup,
+            employeeAge: this.employee.employeeAge,
           },
         })
           .then(({ data }) => {
@@ -265,9 +284,8 @@ export default {
         service({
           url: "/employee/create",
           data: {
-            employeeId: this.employee.employeeId,
             employeeName: this.employee.employeeName,
-            employeeGroup: this.employee.employeeGroup,
+            employeeAge: this.employee.employeeAge,
           },
         })
           .then(({ data }) => {
@@ -288,9 +306,10 @@ export default {
         //新增员工，初始化员工数据为空
         employeeId: "",
         employeeName: "",
-        employeeGuoup: "",
+        employeeAge: "",
+        employeeGroup: "",
       };
-      this.selectAction = 0; //新增员工
+      this.selectAction = false; //新增员工
       this.showEdit = true; //显示编辑框
     },
     employeeEdit(row) {
@@ -299,9 +318,10 @@ export default {
         //编辑员工，填入待编辑员工的内容
         employeeId: row.employeeId,
         employeeName: row.employeeName,
+        employeeAge: row.employeeAge,
         employeeGroup: row.employeeGroup,
       };
-      this.selectAction = 1; //编辑员工
+      this.selectAction = true; //编辑员工
       this.showEdit = true; //显示编辑框
     },
     employeeDelete(row) {

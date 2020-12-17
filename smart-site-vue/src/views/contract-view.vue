@@ -46,6 +46,7 @@
       <vxe-table-column type="seq" width="60"></vxe-table-column>
       <vxe-table-column field="contractId" title="合同编号"></vxe-table-column>
       <vxe-table-column field="clientId" title="委托方编号"></vxe-table-column>
+      <vxe-table-column field="createTime" title="创建时间"></vxe-table-column>
       <vxe-table-column
         field="contractDescription"
         title="合同描述"
@@ -91,7 +92,7 @@
 
     <vxe-modal
       v-model="showEdit"
-      :title="selectAction ? '编辑&保存' : '新增&保存'"
+      :title="selectAction ? '编辑' : '新增'"
       width="800"
       min-width="600"
       min-height="300"
@@ -102,12 +103,70 @@
       <template v-slot>
         <vxe-form
           :data="contract"
-          :items="formItems"
           :rules="formRules"
           title-align="right"
           title-width="100"
           @submit="submitEvent"
-        ></vxe-form>
+        >
+          <vxe-form-item
+            title="合同编号"
+            field="contractId"
+            span="24"
+            :visible="selectAction"
+          >
+            <template v-slot>
+              <vxe-input
+                v-model="contract.contractId"
+                placeholder="请输入合同编号"
+                :disabled="selectAction"
+                clearable
+              ></vxe-input>
+            </template>
+          </vxe-form-item>
+
+          <vxe-form-item title="委托方编号" field="clientId" span="24">
+            <template v-slot>
+              <vxe-input
+                v-model="contract.clientId"
+                placeholder="请输入委托方编号"
+                :disabled="selectAction"
+                clearable
+              ></vxe-input>
+            </template>
+          </vxe-form-item>
+
+          <vxe-form-item
+            title="创建时间"
+            field="createTime"
+            span="24"
+            :visible="selectAction"
+          >
+            <template v-slot>
+              <vxe-input
+                v-model="contract.createTime"
+                placeholder="请输入创建时间"
+                :disabled="selectAction"
+                clearable
+              ></vxe-input>
+            </template>
+          </vxe-form-item>
+
+          <vxe-form-item title="合同描述" field="contractDescription" span="24">
+            <template v-slot>
+              <vxe-input
+                v-model="contract.contractDescription"
+                placeholder="请输入合同描述"
+                clearable
+              ></vxe-input>
+            </template>
+          </vxe-form-item>
+
+          <vxe-form-item align="center" span="24" titleAlign="left">
+            <template v-slot>
+              <vxe-button type="submit" status="primary">提交</vxe-button>
+            </template>
+          </vxe-form-item>
+        </vxe-form>
       </template>
     </vxe-modal>
   </div>
@@ -120,7 +179,7 @@ export default {
     return {
       submitLoading: false, //提交动画
       tableLoading: false,
-      selectAction: 0, //新增0or编辑1
+      selectAction: false, //新增0or编辑1
       showEdit: false, //编辑框
       contractList: [], //合约列表
       contractPage: {
@@ -138,6 +197,7 @@ export default {
         contractId: null,
         clientId: null,
         contractDescription: null,
+        createTime: null,
       },
       formRules: {
         //表单规则
@@ -145,57 +205,11 @@ export default {
         clientId: [{ required: true, message: "请输入委托方编号" }],
         contractDescription: [{ required: true, message: "请输入合同描述" }],
       },
-      formItems: [
-        //表单项
-        {
-          title: "Basic information",
-          span: 24,
-          titleAlign: "left",
-          titleWidth: 200,
-          titlePrefix: { icon: "fa fa-address-card-o" },
-        },
-        {
-          field: "contractId",
-          title: "合同编号",
-          span: 24,
-          itemRender: {
-            name: "$input",
-            props: { placeholder: "请输入合同编号" },
-          },
-        },
-        {
-          field: "clientId",
-          title: "委托方编号",
-          span: 24,
-          itemRender: {
-            name: "$input",
-            props: { placeholder: "请输入委托方编号" },
-          },
-        },
-        {
-          field: "contractDescription",
-          title: "合同描述",
-          span: 24,
-          itemRender: {
-            name: "$input",
-            props: { placeholder: "请输入合同描述" },
-          },
-        },
-        {
-          align: "center",
-          span: 24,
-          titleAlign: "left",
-          itemRender: {
-            name: "$button",
-            props: { type: "submit", content: "提交", status: "primary" },
-          },
-        },
-      ],
     };
   },
 
   mounted() {
-    this.contractListGetLocal();
+    this.contractListGet();
   },
   methods: {
     searchReset() {
@@ -268,7 +282,6 @@ export default {
         service({
           url: "/contract/create",
           data: {
-            contractId: this.contract.contractId,
             clientId: this.contract.clientId,
             contractDescription: this.contract.contractDescription,
           },
@@ -291,8 +304,9 @@ export default {
         contractId: "",
         clientId: "",
         contractDescription: "",
+        createTime: "",
       };
-      this.selectAction = 0; //新增合约
+      this.selectAction = false; //新增合约
       this.showEdit = true; //显示编辑框
     },
     contractEdit(row) {
@@ -300,9 +314,10 @@ export default {
         //编辑合约，填入待编辑合约的内容
         contractId: row.contractId,
         clientId: row.clientId,
+        createTime: row.createTime,
         contractDescription: row.contractDescription,
       };
-      this.selectAction = 1; //编辑合约
+      this.selectAction = true; //编辑合约
       this.showEdit = true; //显示编辑框
     },
     contractDelete(row) {
