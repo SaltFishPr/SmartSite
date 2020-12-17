@@ -4,6 +4,7 @@
 # @date: 2020/12/2
 import json
 import redis
+import time
 from typing import List
 
 import config
@@ -29,45 +30,55 @@ class UserInfo:
     def __del__(self):
         self.__r.close()
 
-    def is_exist(self, administrator_username: str) -> bool:
-        if self.__r.exists(id_to_key(self.__table_name, administrator_username)) == 1:
+    def is_exist(self, account: str) -> bool:
+        if self.__r.exists(id_to_key(self.__table_name, account)) == 1:
             return True
         return False
 
-    def insert(self, administrator_username: str, password: str, identity: str) -> bool:
+    def insert(self, account: str, password: str, identity: str) -> bool:
         """
-        插入管理员信息
-        :param administrator_username: 用户名
+        插入用户信息
+        :param account: 用户名
         :param password: 密码
         :param identity: 用户身份
-        :return: 成功插入返回True，否则返回False
+        :return: 成功返回 True，否则返回 False
         """
-        data = [administrator_username, password, identity]
-        return self.__r.setnx(
-            id_to_key(self.__table_name, administrator_username), json.dumps(data)
-        )
+        data = [account, password, identity]
+        return self.__r.setnx(id_to_key(self.__table_name, account), json.dumps(data))
 
-    def delete(self, administrator_username: str) -> bool:
+    def update(self, account: str, password: str, identity: str) -> bool:
+        """
+        更新用户信息
+        :param account: 用户名
+        :param password: 密码
+        :param identity: 用户身份
+        :return: 成功返回 True，否则返回 False
+        """
+        data = [account, password, identity]
+        if not self.is_exist(account):
+            return False
+        self.__r.set(id_to_key(self.__table_name, account), json.dumps(data))
+        return True
+
+    def delete(self, account: str) -> bool:
         """
         删除用户信息
-        :param administrator_username: 用户名
-        :return: 成功删除返回True，否则返回False
+        :param account: 用户名
+        :return: 成功返回 True，否则返回 False
         """
-        if self.__r.delete(id_to_key(self.__table_name, administrator_username)) == 1:
+        if self.__r.delete(id_to_key(self.__table_name, account)) == 1:
             return True
         return False
 
-    def get(self, administrator_username: str) -> List:
+    def get(self, account: str) -> List:
         """
         获取用户信息
-        :param administrator_username: 用户名
+        :param account: 用户名
         :return: [用户名, 密码, 用户身份]
         """
-        if not self.is_exist(administrator_username):
+        if not self.is_exist(account):
             return []
-        return json.loads(
-            self.__r.get(id_to_key(self.__table_name, administrator_username))
-        )
+        return json.loads(self.__r.get(id_to_key(self.__table_name, account)))
 
 
 class ClientInfo:
@@ -91,7 +102,7 @@ class ClientInfo:
         插入委托方信息
         :param client_name: 委托方名称
         :param client_description: 委托方描述
-        :return: 成功插入返回True，否则返回False
+        :return: 成功返回 True，否则返回 False
         """
         client_id = random_id()  # 生成委托方ID
         while self.is_exist(client_id):
@@ -106,7 +117,7 @@ class ClientInfo:
         :param client_id: 委托方ID
         :param client_name: 委托方名称
         :param client_description: 委托方描述
-        :return: 成功插入返回True，否则返回False
+        :return: 成功返回 True，否则返回 False
         """
         data = [client_id, client_name, client_description]
         if not self.is_exist(client_id):
@@ -118,7 +129,7 @@ class ClientInfo:
         """
         删除委托方信息
         :param client_id: 委托方ID
-        :return: 成功删除返回True，否则返回False
+        :return: 成功返回 True，否则返回 False
         """
         if self.__r.delete(id_to_key(self.__table_name, client_id)) == 1:
             return True
@@ -133,6 +144,20 @@ class ClientInfo:
         if not self.is_exist(client_id):
             return []
         return json.loads(self.__r.get(id_to_key(self.__table_name, client_id)))
+
+    def get_all(self):
+        clients = self.__r.keys(pattern="ClientInfo:*")
+        res = []
+        for client in clients:
+            data = self.get(key_to_id(client))
+            res.append(
+                {
+                    "clientId": data[0],
+                    "clientName": data[1],
+                    "clientDescription": data[2],
+                }
+            )
+        return res
 
 
 class ProjectInfo:
@@ -157,20 +182,20 @@ class ProjectInfo:
         check_system_id: str,
         project_status: str,
         project_risk_value: int,
-        project_creation_time: str,
         project_description: str,
         project_manager: str,
+        project_check_group_id: str,
     ) -> bool:
         """
-        插入该项目信息
+        插入项目信息
         :param client_id: 委托方ID
         :param check_system_id: 检查体系 ID
         :param project_status: 项目状态
         :param project_risk_value: 项目风险值
-        :param project_creation_time: 项目创建时间
         :param project_description: 项目描述
         :param project_manager: 项目负责人
-        :return: 成功插入返回 True，否则返回 False
+        :param project_check_group_id: 检查小组ID
+        :return: 成功返回 True，否则返回 False
         """
         project_id = random_id()  # 生成项目ID
         while self.is_exist(project_id):
@@ -182,19 +207,61 @@ class ProjectInfo:
             check_system_id,
             project_status,
             project_risk_value,
-            project_creation_time,
+            time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),  # 项目创建时间
             project_description,
             project_manager,
+            project_check_group_id,
         ]
         return self.__r.setnx(
             id_to_key(self.__table_name, project_id), json.dumps(data)
         )
 
+    def update(
+        self,
+        project_id,
+        client_id,
+        check_system_id,
+        project_status,
+        project_risk_value,
+        creation_time,
+        project_description,
+        project_manager,
+        project_check_group_id,
+    ):
+        """
+        更新合同信息
+        :param project_id: 项目ID
+        :param client_id: 委托方ID
+        :param check_system_id: 检查体系ID
+        :param project_status: 项目状态
+        :param project_risk_value: 项目风险值
+        :param creation_time: 项目创建时间
+        :param project_description: 项目描述
+        :param project_manager: 项目管理人
+        :param project_check_group_id: 检查小组ID
+        :return: 成功返回 True，否则返回 False
+        """
+        data = [
+            project_id,
+            client_id,
+            check_system_id,
+            project_status,
+            project_risk_value,
+            creation_time,
+            project_description,
+            project_manager,
+            project_check_group_id,
+        ]
+        if not self.is_exist(project_id):
+            return False
+        self.__r.set(id_to_key(self.__table_name, project_id), json.dumps(data))
+        return True
+
     def delete(self, project_id: str) -> bool:
         """
         删除项目信息
         :param project_id: 项目ID
-        :return: 成功删除返回True，否则返回False
+        :return: 成功返回 True，否则返回 False
         """
         if self.__r.delete(id_to_key(self.__table_name, project_id)) == 1:
             return True
@@ -209,6 +276,26 @@ class ProjectInfo:
         if not self.is_exist(project_id):
             return []
         return json.loads(self.__r.get(id_to_key(self.__table_name, project_id)))
+
+    def get_all(self):
+        projects = self.__r.keys(pattern="ProjectInfo:*")
+        res = []
+        for project in projects:
+            data = self.get(key_to_id(project))
+            res.append(
+                {
+                    "projectId": data[0],
+                    "clientId": data[1],
+                    "projectCheckSystemID": data[2],
+                    "projectStatus": data[3],
+                    "projectRiskValue": data[4],
+                    "projectCreationTime": data[5],
+                    "projectDescription": data[6],
+                    "projectManager": data[7],
+                    "projectCheckGroupId": data[8],
+                }
+            )
+        return res
 
 
 class ContractInfo:
@@ -230,21 +317,24 @@ class ContractInfo:
     def insert(
         self,
         contract_content: str,
-        contract_creation_date: str,
         client_id: str,
     ) -> bool:
         """
         插入合同信息
         :param contract_content: 合同内容
-        :param contract_creation_date: 合同创建日期
         :param client_id: 委托方ID
-        :return: 成功插入返回True，否则返回False
+        :return: 成功返回 True，否则返回 False
         """
         contract_id = random_id()  # 生成合同ID
         while self.is_exist(contract_id):
             contract_id = random_id()
 
-        data = [contract_id, contract_content, contract_creation_date, client_id]
+        data = [
+            contract_id,
+            contract_content,
+            time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),  # 合同创建日期
+            client_id,
+        ]
         return self.__r.setnx(
             id_to_key(self.__table_name, contract_id), json.dumps(data)
         )
@@ -262,7 +352,7 @@ class ContractInfo:
         :param contract_content: 合同内容
         :param contract_creation_date: 合同创建时间
         :param client_id: 委托方ID
-        :return: 成功插入返回True，否则返回False
+        :return: 成功返回 True，否则返回 False
         """
         data = [contract_id, contract_content, contract_creation_date, client_id]
         if not self.is_exist(contract_id):
@@ -274,7 +364,7 @@ class ContractInfo:
         """
         删除合同信息
         :param contract_id: 合同ID
-        :return: 成功删除返回True，否则返回False
+        :return: 成功返回 True，否则返回 False
         """
         if self.__r.delete(id_to_key(self.__table_name, contract_id)) == 1:
             return True
@@ -291,10 +381,18 @@ class ContractInfo:
         return json.loads(self.__r.get(id_to_key(self.__table_name, contract_id)))
 
     def get_all(self) -> List:
-        contracts = self.__r.keys(pattern="ClientContractInfo:*")
+        contracts = self.__r.keys(pattern="ContractInfo:*")
         res = []
         for contract in contracts:
-            res.append(self.get(key_to_id(contract)))
+            data = self.get(key_to_id(contract))
+            res.append(
+                {
+                    "contractId": data[0],
+                    "contractDescription": data[1],
+                    "creationTime": data[2],
+                    "clientId": data[3],
+                }
+            )
         return res
 
 
@@ -537,7 +635,7 @@ class GroupInfo:
         插入小组组员信息
         :param employee_id: 员工ID
         :param is_leader: 是否为组长
-        :return: 成功插入信息返回True，否则返回False
+        :return: 成功返回 True，否则返回 False
         """
         data = {"is_leader": is_leader}
         # 如果是第一个员工加入则初始化leader_num为0
@@ -558,7 +656,7 @@ class GroupInfo:
         """
         删除组内某一员工
         :param employee_id: 员工ID
-        :return: 删除成功返回True
+        :return: 成功返回 True，否则返回 False
         """
         employee = self.get_employee(employee_id)
 

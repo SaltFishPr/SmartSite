@@ -20,3 +20,9 @@ def random_id():
 
 def random_employee_id():
     return "".join(random.sample(string.digits, 4))
+
+
+def page_size_convert(page: int, size: int, length: int) -> (int, int):
+    start = (page - 1) * size
+    end = page * size if page * size <= length else length
+    return start, end

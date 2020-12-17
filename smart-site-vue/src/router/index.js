@@ -16,7 +16,28 @@ const clientView = () => import('../views/client-view.vue')
 const routes = [{
 	path: '/home',
 	name: 'homeView',
-	component: homeView
+	component: homeView,
+	children:[{
+		path: 'contract',
+		name: 'contractView',
+		component: contractView,
+	}, {
+		path: 'project',
+		name: 'projectView',
+		component: projectView,
+	}, {
+		path: 'employee',
+		name: 'employeeView',
+		component: employeeView,
+	}, {
+		path: 'group',
+		name: 'groupView',
+		component: groupView,
+	},{
+		path: 'client',
+		name: 'clientView',
+		component: clientView,
+	}]
 }, {
 	path: '/login',
 	name: 'loginView',
@@ -26,27 +47,7 @@ const routes = [{
 	path: '/register',
 	name: 'registerView',
 	component: registerView,
-}, {
-	path: '/contract',
-	name: 'contractView',
-	component: contractView,
-}, {
-	path: '/project',
-	name: 'projectView',
-	component: projectView,
-}, {
-	path: '/employee',
-	name: 'employeeView',
-	component: employeeView,
-}, {
-	path: '/group',
-	name: 'groupView',
-	component: groupView,
-},{
-	path: '/client',
-	name: 'clientView',
-	component: clientView,
-},{
+} ,{
 	path: '/test',
 	name: 'testView',
 	component: testView,
