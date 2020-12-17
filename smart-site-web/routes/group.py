@@ -5,6 +5,7 @@
 from flask import Blueprint, request, json
 
 import db
+from utils import page_size_convert
 
 bp = Blueprint("group", __name__, url_prefix="/group")
 
@@ -13,18 +14,20 @@ bp = Blueprint("group", __name__, url_prefix="/group")
 def create_group():
     data = {"flag": False, "message": "未执行创建"}
     if request.method == "POST":
-        # print(json.loads(request.form["data"]))
-        group_id = json.loads(request.form["data"])["groupId"]
+        rev_data = json.loads(request.form["data"])
+        group_id = rev_data["groupId"]
         group = db.GroupInfo(group_id)
         if group.is_exist():
             data["flag"] = False
             data["message"] = "theGroupAlreadyExists"
             return json.dumps(data)
-        employee_string: str = json.loads(request.form["data"])["groupMember"]
+
+        employee_string: str = rev_data["groupMember"]
         employee_list = employee_string.split("-")
         for employee in employee_list:
             group.add_employee(employee, False)
-        leader_string: str = json.loads(request.form["data"])["groupLeader"]
+
+        leader_string: str = rev_data["groupLeader"]
         leader_list = leader_string.split("-")
         for leader in leader_list:
             if group.get_leader_num() == 3:
@@ -34,6 +37,7 @@ def create_group():
                 ] = "The number of group leaders in the group reaches the upper limit"
                 return json.dumps(data)
             group.add_employee(leader, True)
+
         data["flag"] = True
         data["message"] = "successfullyCreatedGroup"
         return json.dumps(data)
@@ -61,16 +65,19 @@ def delete_group():
 def update_group():
     data = {"flag": False, "message": "未执行更新小组"}
     if request.method == "POST":
-
-        group_id = json.loads(request.form["data"])["groupId"]
+        rev_data = json.loads(request.form["data"])
+        group_id = rev_data["groupId"]
         group = db.GroupInfo(group_id)
+
         for employee_id_delete in group.get_all():
             group.remove_employee(employee_id_delete[0])
-        employee_string: str = json.loads(request.form["data"])["groupMember"]
+
+        employee_string: str = rev_data["groupMember"]
         employee_list = employee_string.split("-")
         for employee in employee_list:
             group.add_employee(employee, False)
-        leader_string: str = json.loads(request.form["data"])["groupLeader"]
+
+        leader_string: str = rev_data["groupLeader"]
         leader_list = leader_string.split("-")
         for leader in leader_list:
             if group.get_leader_num() == 3:
@@ -80,6 +87,7 @@ def update_group():
                 ] = "The number of group leaders in the group reaches the upper limit"
                 return json.dumps(data)
             group.add_employee(leader, True)
+
         data["flag"] = True
         data["message"] = "successfullyUpdateGroup"
         return json.dumps(data)
@@ -96,11 +104,11 @@ def get_all_groups():
             rev_data["searchKey"],
         )
         if search_key == "":
-            group_list = db.get_all_group()
-            start = (page - 1) * size
-            end = page * size if page * size <= len(group_list) else len(group_list)
+            group_list = db.get_all_groups()
+            length = len(group_list)
+            start, end = page_size_convert(page, size, length)
             data = {
-                "resultTotal": len(db.get_all_group()),
+                "resultTotal": length,
                 "resultList": group_list[start:end],
             }
             return json.dumps(data)

@@ -3,9 +3,10 @@
 # @file: db.py
 # @date: 2020/12/2
 import json
-import redis
 import time
 from typing import List
+
+import redis
 
 import config
 from utils import id_to_key, key_to_id, random_id, random_employee_id
@@ -729,7 +730,7 @@ class GroupInfo:
         return res
 
 
-def get_all_group():
+def get_all_groups():
     r = redis.Redis(connection_pool=pool)
     contracts = r.keys(pattern="GroupInfo:*")
     r.close()

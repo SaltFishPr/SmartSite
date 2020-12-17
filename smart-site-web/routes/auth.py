@@ -17,7 +17,7 @@ from flask import (
     request,
     session,
     url_for,
-    json
+    json,
 )
 
 import db
@@ -87,13 +87,13 @@ def login_or_register():
     username = request.form["username"]
     password = request.form["password"]
     data = {
-        "message":"未执行操作",
-        "ret_code":-4,
+        "message": "未执行操作",
+        "ret_code": -4,
     }
 
     table = db.UserInfo()
     user = table.get(username)
-    if table.is_exist(username):  #如果存在该用户则进行登陆操作
+    if table.is_exist(username):  # 如果存在该用户则进行登陆操作
         if user[1] == password:
             data["message"] = "登陆成功"
             data["ret_code"] = 1
@@ -102,8 +102,8 @@ def login_or_register():
             data["message"] = "密码错误，请重新输入"
             data["ret_code"] = -1
             return json.dumps(data)
-    else:  #如果不存在该用户进行注册操作
-        if table.insert(username, password, "Android端注册员工"):
+    else:  # 如果不存在该用户进行注册操作
+        if table.insert(username, password, "Android"):
             data["message"] = "为你注册成功"
             data["ret_code"] = 0
             return json.dumps(data)
@@ -111,7 +111,6 @@ def login_or_register():
             data["message"] = "注册失败，请重新注册"
             data["ret_code"] = -2
             return json.dumps(data)
-
 
 
 @bp.before_app_request  # 注册一个在视图函数之前运行的函数，不论其 URL 是什么

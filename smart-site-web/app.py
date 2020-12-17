@@ -3,9 +3,9 @@
 # @file: __init__.py.py
 # @date: 2020/12/13
 from flask import Flask
+from flask_cors import *
 
 from routes import auth, contract, employee, group
-from flask_cors import *
 
 
 def create_app():
