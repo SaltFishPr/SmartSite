@@ -23,7 +23,7 @@ def create_group():
         employee_string: str = json.loads(request.form["data"])["groupMember"]
         employee_list = employee_string.split("-")
         for employee in employee_list:
-            group.add_employee(int(employee), False)
+            group.add_employee(employee, False)
         leader_string: str = json.loads(request.form["data"])["groupLeader"]
         leader_list = leader_string.split("-")
         for leader in leader_list:
@@ -33,7 +33,7 @@ def create_group():
                     "message"
                 ] = "The number of group leaders in the group reaches the upper limit"
                 return json.dumps(data)
-            group.add_employee(int(leader), True)
+            group.add_employee(leader, True)
         data["flag"] = True
         data["message"] = "successfullyCreatedGroup"
         return json.dumps(data)
@@ -69,7 +69,7 @@ def update():
         employee_string: str = json.loads(request.form["data"])["groupMember"]
         employee_list = employee_string.split("-")
         for employee in employee_list:
-            group.add_employee(int(employee), False)
+            group.add_employee(employee, False)
         leader_string: str = json.loads(request.form["data"])["groupLeader"]
         leader_list = leader_string.split("-")
         for leader in leader_list:
@@ -79,7 +79,7 @@ def update():
                     "message"
                 ] = "The number of group leaders in the group reaches the upper limit"
                 return json.dumps(data)
-            group.add_employee(int(leader), True)
+            group.add_employee(leader, True)
         data["flag"] = True
         data["message"] = "successfullyUpdateGroup"
         return json.dumps(data)

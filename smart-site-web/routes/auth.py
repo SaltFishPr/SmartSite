@@ -96,11 +96,7 @@ def logout():
 
 
 def login_required(view):
-    """
-    装饰器 用于身份验证
-    :param view:
-    :return:
-    """
+    """装饰器 用于身份验证"""
 
     @functools.wraps(view)
     def wrapped_view(**kwargs):
