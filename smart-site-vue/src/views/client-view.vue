@@ -104,12 +104,52 @@
       <template v-slot>
         <vxe-form
           :data="client"
-          :items="formItems"
           :rules="formRules"
           title-align="right"
           title-width="100"
           @submit="submitEvent"
-        ></vxe-form>
+        >
+          <vxe-form-item
+            title="委托方编号"
+            field="clientId"
+            span="24"
+            :visible="selectAction"
+          >
+            <template v-slot>
+              <vxe-input
+                v-model="client.clientId"
+                placeholder="请输入委托方编号"
+                :disabled="selectAction"
+                clearable
+              ></vxe-input>
+            </template>
+          </vxe-form-item>
+          <vxe-form-item title="委托方名称" field="clientName" span="24">
+            <template v-slot>
+              <vxe-input
+                v-model="client.clientName"
+                placeholder="请输入委托方名称"
+                :disabled="selectAction"
+                clearable
+              ></vxe-input>
+            </template>
+          </vxe-form-item>
+          <vxe-form-item title="委托方描述" field="clientDescription" span="24">
+            <template v-slot>
+              <vxe-input
+                v-model="client.clientDescription"
+                placeholder="请输入委托方描述"
+                clearable
+              ></vxe-input>
+            </template>
+          </vxe-form-item>
+
+          <vxe-form-item align="center" span="24" titleAlign="left">
+            <template v-slot>
+              <vxe-button type="submit" status="primary">提交</vxe-button>
+            </template></vxe-form-item
+          >
+        </vxe-form>
       </template>
     </vxe-modal>
   </div>
@@ -122,7 +162,7 @@ export default {
     return {
       submitLoading: false, //提交动画
       tableLoading: false,
-      selectAction: 0, //新增0or编辑1
+      selectAction: false, //新增0or编辑1
       showEdit: false, //编辑框
       clientList: [], //合约列表
       clientPage: {
@@ -143,59 +183,12 @@ export default {
       },
       formRules: {
         //表单规则
-        clientId: [{ required: true, message: "请输入委托方编号" }],
       },
-      formItems: [
-        //表单项
-        {
-          title: "Basic information",
-          span: 24,
-          titleAlign: "left",
-          titleWidth: 200,
-          titlePrefix: { icon: "fa fa-address-card-o" },
-        },
-        {
-          field: "clientId",
-          title: "委托方编号",
-          span: 24,
-          itemRender: {
-            name: "$input",
-            props: { placeholder: "请输入委托方编号" },
-          },
-        },
-        {
-          field: "clientName",
-          title: "委托方名称",
-          span: 24,
-          itemRender: {
-            name: "$input",
-            props: { placeholder: "请输入委托方名称号" },
-          },
-        },
-        {
-          field: "clientDescription",
-          title: "委托方描述",
-          span: 24,
-          itemRender: {
-            name: "$input",
-            props: { placeholder: "请输入委托方描述" },
-          },
-        },
-        {
-          align: "center",
-          span: 24,
-          titleAlign: "left",
-          itemRender: {
-            name: "$button",
-            props: { type: "submit", content: "提交", status: "primary" },
-          },
-        },
-      ],
     };
   },
 
   mounted() {
-    this.clientListGetLocal();
+    this.clientListGet();
   },
   methods: {
     searchReset() {
@@ -268,7 +261,6 @@ export default {
         service({
           url: "/client/create",
           data: {
-            clientId: this.client.clientId,
             clientName: this.client.clientName,
             clientDescription: this.client.clientDescription,
           },
@@ -292,7 +284,7 @@ export default {
         clientName: "",
         clientDescription: "",
       };
-      this.selectAction = 0; //新增合约
+      this.selectAction = false; //新增合约
       this.showEdit = true; //显示编辑框
     },
     clientEdit(row) {
@@ -302,7 +294,7 @@ export default {
         clientName: row.clientName,
         clientDescription: row.clientDescription,
       };
-      this.selectAction = 1; //编辑合约
+      this.selectAction = true; //编辑合约
       this.showEdit = true; //显示编辑框
     },
     clientDelete(row) {

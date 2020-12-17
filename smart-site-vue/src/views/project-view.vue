@@ -47,20 +47,8 @@
       <vxe-table-column field="projectId" title="项目ID"></vxe-table-column>
       <vxe-table-column field="clientId" title="委托方ID"></vxe-table-column>
       <vxe-table-column
-        field="projectManager"
-        title="项目负责人"
-      ></vxe-table-column>
-      <vxe-table-column
         field="projectCheckSystemID"
         title="检查体系ID"
-      ></vxe-table-column>
-      <vxe-table-column
-        field="projectDescription"
-        title="项目描述"
-      ></vxe-table-column>
-      <vxe-table-column
-        field="projectCreationTime"
-        title="项目创建时间"
       ></vxe-table-column>
       <vxe-table-column field="projectStatus" title="项目状态">
         <template v-slot="{ row }">
@@ -72,9 +60,26 @@
         </template>
       </vxe-table-column>
       <vxe-table-column
-        field="projectCheckGroupId"
-        title="检查小组编号"
+        field="projectRiskValue"
+        title="项目风险值"
       ></vxe-table-column>
+      <vxe-table-column
+        field="projectCreationTime"
+        title="项目创建时间"
+      ></vxe-table-column>
+      <vxe-table-column
+        field="projectDescription"
+        title="项目描述"
+      ></vxe-table-column>
+      <vxe-table-column
+        field="projectManager"
+        title="项目管理人"
+      ></vxe-table-column>
+      <vxe-table-column
+        field="projectCheckGroupId"
+        title="检查小组ID"
+      ></vxe-table-column>
+
       <!-- <vxe-table-column
         field="projectCheckGroupLeader"
         title="检查小组组长"
@@ -135,12 +140,122 @@
       <template v-slot>
         <vxe-form
           :data="project"
-          :items="formItems"
           :rules="formRules"
           title-align="right"
           title-width="120"
           @submit="submitEvent"
-        ></vxe-form>
+        >
+          <vxe-form-item
+            title="项目编号"
+            field="projectId"
+            span="24"
+            :visible="selectAction"
+          >
+            <template v-slot>
+              <vxe-input
+                v-model="project.projectId"
+                placeholder="请输入项目编号"
+                :disabled="selectAction"
+                clearable
+              ></vxe-input>
+            </template>
+          </vxe-form-item>
+
+          <vxe-form-item title="委托方编号" field="clientId" span="24">
+            <template v-slot>
+              <vxe-input
+                v-model="project.clientId"
+                placeholder="请输入委托方编号"
+                :disabled="selectAction"
+                clearable
+              ></vxe-input>
+            </template>
+          </vxe-form-item>
+
+          <vxe-form-item
+            title="检查体系"
+            field="projectCheckSystemID"
+            span="24"
+          >
+            <template v-slot>
+              <vxe-input
+                v-model="project.projectCheckSystemID"
+                placeholder="请输入检查体系"
+                :disabled="selectAction"
+                clearable
+              ></vxe-input>
+            </template>
+          </vxe-form-item>
+
+          <vxe-form-item title="项目状态" field="projectStatus" span="24">
+            <template v-slot>
+              <vxe-input
+                v-model="project.projectStatus"
+                placeholder="请输入项目状态"
+                :disabled="selectAction"
+                clearable
+              ></vxe-input>
+            </template>
+          </vxe-form-item>
+          <vxe-form-item title="风险评估" field="projectRiskValue" span="24">
+            <template v-slot>
+              <vxe-input
+                v-model="project.projectRiskValue"
+                placeholder="请输入风险评估"
+                :disabled="selectAction"
+                clearable
+              ></vxe-input>
+            </template>
+          </vxe-form-item>
+          <vxe-form-item
+            title="项目创建时间"
+            field="projectCreationTime"
+            span="24"
+            :visible="selectAction"
+          >
+            <template v-slot>
+              <vxe-input
+                v-model="project.projectCreationTime"
+                placeholder="项目创建时间"
+                :disabled="selectAction"
+                clearable
+              ></vxe-input>
+            </template>
+          </vxe-form-item>
+          <vxe-form-item title="项目描述" field="projectDescription" span="24">
+            <template v-slot>
+              <vxe-input
+                v-model="project.projectDescription"
+                placeholder="项目描述"
+                clearable
+              ></vxe-input>
+            </template>
+          </vxe-form-item>
+          <vxe-form-item title="项目负责人" field="projectManager" span="24">
+            <template v-slot>
+              <vxe-input
+                v-model="project.projectManager"
+                placeholder="请输入项目负责人"
+                clearable
+              ></vxe-input>
+            </template>
+          </vxe-form-item>
+          <vxe-form-item title="检查小组" field="projectCheckGroupId" span="24">
+            <template v-slot>
+              <vxe-input
+                v-model="project.projectCheckGroupId"
+                placeholder="项目检查小组"
+                clearable
+              ></vxe-input>
+            </template>
+          </vxe-form-item>
+
+          <vxe-form-item align="center" span="24" titleAlign="left">
+            <template v-slot>
+              <vxe-button type="submit" status="primary">提交</vxe-button>
+            </template>
+          </vxe-form-item></vxe-form
+        >
       </template>
     </vxe-modal>
   </div>
@@ -153,7 +268,7 @@ export default {
     return {
       submitLoading: false, //提交动画
       tableLoading: false,
-      selectAction: 0, //新增0or编辑1
+      selectAction: false, //新增0or编辑1
       showEdit: false, //编辑框
       projectList: [], //合约列表
       projectPage: {
@@ -175,132 +290,21 @@ export default {
         projectDescription: null, //项目描述
         projectCreationTime: null, //项目创建时间
         projectStatus: null, //项目状态
-        // projectCheckGroupLeader: null,
-        // projectCheckGroupMember: null,
+        projectRiskValue: null,
         projectCheckGroupId: null,
       },
       formRules: {
         //表单规则
-        projectId: [{ required: true, message: "请输入员工编号" }],
-        projectName: [{ required: true, message: "请输入员工姓名" }],
+
         projectCheckGroupId: [
           { required: true, message: "请输入检查小组编号" },
         ], //匹配001-001-003
       },
-      formItems: [
-        //表单项
-        {
-          title: "Basic information",
-          span: 24,
-          titleAlign: "left",
-          titleWidth: 200,
-          titlePrefix: { icon: "fa fa-address-card-o" },
-        },
-        {
-          field: "projectId",
-          title: "项目ID",
-          span: 24,
-          itemRender: {
-            name: "$input",
-            props: { placeholder: "请输入项目ID" },
-          },
-        },
-        {
-          field: "clientId",
-          title: "委托方ID",
-          span: 24,
-          itemRender: {
-            name: "$input",
-            props: { placeholder: "请输入委托方ID" },
-          },
-        },
-        {
-          field: "projectManager",
-          title: "项目负责人",
-          span: 24,
-          itemRender: {
-            name: "$input",
-            props: { placeholder: "请输入项目负责人" },
-          },
-        },
-        {
-          field: "projectCheckSystemID",
-          title: "检查体系编号",
-          span: 24,
-          itemRender: {
-            name: "$input",
-            props: { placeholder: "请输入检查体系编号" },
-          },
-        },
-        {
-          field: "projectDescription",
-          title: "项目描述",
-          span: 24,
-          itemRender: {
-            name: "$input",
-            props: { placeholder: "请输入项目描述" },
-          },
-        },
-        {
-          field: "projectCreationTime",
-          title: "项目创建时间",
-          span: 24,
-          itemRender: {
-            name: "$input",
-            props: { placeholder: "请输入项目创建时间" },
-          },
-        },
-        {
-          field: "projectStatus",
-          title: "项目状态",
-          span: 24,
-          itemRender: {
-            name: "$input",
-            props: { placeholder: "请输入项目状态" },
-          },
-        },
-        {
-          field: "projectCheckGroupId",
-          title: "检查小组编号",
-          span: 24,
-          itemRender: {
-            name: "$input",
-            props: { placeholder: "请输入检查小组编号" },
-          },
-        },
-        // {
-        //   field: "projectCheckGroupLeader",
-        //   title: "检查小组组长",
-        //   span: 24,
-        //   itemRender: {
-        //     name: "$input",
-        //     props: { placeholder: "请输入检查小组组长" },
-        //   },
-        // },
-        // {
-        //   field: "projectCheckGroupMember",
-        //   title: "检查小组组员",
-        //   span: 24,
-        //   itemRender: {
-        //     name: "$input",
-        //     props: { placeholder: "请输入检查小组组员" },
-        //   },
-        // },
-        {
-          align: "center",
-          span: 24,
-          titleAlign: "left",
-          itemRender: {
-            name: "$button",
-            props: { type: "submit", content: "提交", status: "primary" },
-          },
-        },
-      ],
     };
   },
 
   mounted() {
-    this.projectListGetLocal();
+    this.projectListGet();
   },
   methods: {
     checkStatusGet() {
@@ -357,12 +361,12 @@ export default {
           data: {
             projectId: this.project.projectId,
             clientId: this.project.clientId,
-            projectManager: this.project.projectDescription,
+            projectManager: this.project.projectManager,
             projectCheckSystemID: this.project.projectCheckSystemID,
             projectDescription: this.project.projectDescription,
             projectCreationTime: this.project.projectCreationTime,
-            // projectCheckGroupLeader: "", //项目状态
-            // projectCheckGroupMember: "", //项目状态
+            projectStatus: this.project.projectStatus,
+            projectRiskValue: this.project.projectRiskValue,
             projectCheckGroupId: this.project.projectCheckGroupId,
           },
         })
@@ -381,14 +385,12 @@ export default {
         service({
           url: "/project/create",
           data: {
-            projectId: this.project.projectId,
             clientId: this.project.clientId,
-            projectManager: this.project.projectDescription,
+            projectManager: this.project.projectManager,
             projectCheckSystemID: this.project.projectCheckSystemID,
             projectDescription: this.project.projectDescription,
-            projectCreationTime: this.project.projectCreationTime,
-            // projectCheckGroupLeader: "", //项目状态
-            // projectCheckGroupMember: "", //项目状态
+            projectStatus: this.project.projectStatus,
+            projectRiskValue: this.project.projectRiskValue,
             projectCheckGroupId: this.project.projectCheckGroupId,
           },
         })
@@ -407,15 +409,17 @@ export default {
     projectAdd() {
       this.project = {
         //新增合约，初始化合约数据为空
-        projectId: "", //项目ID
-        clientId: "", //委托方ID
-        projectManager: "", //项目负责人
-        projectCheckSystemID: "", //检查体系ID
-        projectDescription: "", //项目描述
-        projectCreationTime: "", //项目创建时间
+        projectId: "",
+        clientId: "",
+        projectManager: "",
+        projectCheckSystemID: "",
+        projectDescription: "",
+        projectCreationTime: "",
+        projectStatus: "",
+        projectRiskValue: "",
         projectCheckGroupId: "",
       };
-      this.selectAction = 0; //新增合约
+      this.selectAction = false; //新增合约
       this.showEdit = true; //显示编辑框
     },
     projectEdit(row) {
@@ -429,11 +433,10 @@ export default {
         projectDescription: row.projectDescription,
         projectCreationTime: row.projectCreationTime,
         projectStatus: row.projectStatus,
-        // projectCheckGroupLeader: row.projectCheckGroupLeader,
-        // projectCheckGroupMember: row.projectCheckGroupMember,
+        projectRiskValue: row.projectRiskValue,
         projectCheckGroupId: row.projectCheckGroupId,
       };
-      this.selectAction = 1; //编辑合约
+      this.selectAction = true; //编辑合约
       this.showEdit = true; //显示编辑框
     },
     projectDelete(row) {
