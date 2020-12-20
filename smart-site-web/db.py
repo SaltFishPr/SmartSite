@@ -25,7 +25,7 @@ class UserInfo:
 
     def __init__(self):
         """初始化表信息"""
-        self.__table_name = "ClientContractInfo"  # 表名
+        self.__table_name = "UserInfo"  # 表名
         self.__r = redis.Redis(connection_pool=pool)
 
     def __del__(self):
@@ -477,6 +477,54 @@ class CheckSystemInfo:
         if self.__r.exists(id_to_key(self.__table_name, check_system_id)) == 1:
             return True
         return False
+
+    def insert(self, system_id, system_name, pre_id, system_description):
+        """
+        向检查体系树中插入一个节点
+        :param system_id: 当前检查体系ID
+        :param system_name: 当前检查体系名称
+        :param pre_id: 前置检查体系ID
+        :param system_description: 检查体系描述
+        :return: 成功返回 True，否则返回 False
+        """
+        data = [system_id, system_name, pre_id, system_description]
+        return self.__r.setnx(id_to_key(self.__table_name, system_id), json.dumps(data))
+
+    def delete(self, system_id: str) -> bool:
+        """
+        删除检查信息
+        :param system_id: 检查体系ID
+        :return: 成功返回 True，否则返回 False
+        """
+        if self.__r.delete(id_to_key(self.__table_name, system_id)) == 1:
+            return True
+        return False
+
+    def get(self, system_id: str) -> List:
+        """
+        获取一个检查体系信息
+        :param system_id: 检查体系ID
+        :return: [当前检查体系ID, 当前检查体系名称, 前置检查体系ID, 检查体系描述]
+        """
+        if not self.is_exist(system_id):
+            return []
+        return json.loads(self.__r.get(id_to_key(self.__table_name, system_id)))
+
+    def get_all(self):
+        check_system_keys = self.__r.keys(pattern="CheckSystemInfo:*")
+        res = []
+        table = CheckSystemInfo()
+        for check_system_key in check_system_keys:
+            tmp_data = table.get(key_to_id(check_system_key))
+            res.append(
+                {
+                    "system_id": tmp_data[0],  # 当前检查体系ID
+                    "system_name": tmp_data[1],  # 当前检查体系名称
+                    "pre_id": tmp_data[2],  # 前置检查体系ID
+                    "system_description": tmp_data[3],  # 检查体系描述
+                }
+            )
+        return res
 
 
 class EmployeeInfo:
