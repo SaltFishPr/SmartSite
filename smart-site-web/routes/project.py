@@ -84,4 +84,4 @@ def get_by_group():
         if rev_id == project["projectCheckGroupId"]:
             description_list.append(project["projectDescription"])
             id_list.append(project["projectId"])
-    return json.dumps({"project_list":description_list,"id_list":id_list})
+    return json.dumps({"project_list": description_list, "id_list": id_list})

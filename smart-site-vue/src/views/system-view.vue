@@ -6,7 +6,7 @@
       default-expand-all
       :expand-on-click-node="false"
     >
-      <span slot-scope="{ data }">
+      <span slot-scope="{ node, data }">
         <span :title="data.systemDescription">{{ data.systemName }}</span>
         <span>
           <el-button type="text" size="mini" @click="() => append(data)">
@@ -15,13 +15,16 @@
           <el-button type="text" size="mini" @click="() => remove(data)">
             Delete
           </el-button>
+          <el-button type="text" size="mini" @click="() => update(node, data)">
+            Update
+          </el-button>
         </span>
       </span>
     </el-tree>
 
     <vxe-modal
       v-model="showEdit"
-      title="新增"
+      :title="selectAction ? '编辑&保存' : '新增&保存'"
       wsystemIdth="800"
       min-wsystemIdth="600"
       min-height="300"
@@ -42,6 +45,7 @@
               <vxe-input
                 v-model="checkSystemNode.systemId"
                 placeholder="请输入当前检查体系编号"
+                :disabled="selectAction"
                 clearable
               ></vxe-input>
             </template>
@@ -163,6 +167,7 @@ export default {
       formRules: {},
       showEdit: false,
       submitLoading: false,
+      selectAction: false,
     };
   },
 
@@ -177,6 +182,17 @@ export default {
         preId: nodeData.systemId,
         systemDescription: "",
       };
+      (this.selectAction = false), (this.showEdit = true);
+      console.dir(nodeData);
+    },
+    update(node, nodeData) {
+      this.checkSystemNode = {
+        systemId: nodeData.systemId,
+        systemName: nodeData.systemName,
+        preId: node.parent.data.systemId,
+        systemDescription: nodeData.systemDescription,
+      };
+      this.selectAction = true;
       this.showEdit = true;
       console.dir(nodeData);
     },
@@ -207,27 +223,52 @@ export default {
           console.log("删除失败");
         });
     },
+
     submitEvent() {
       this.submitLoading = true;
-      service({
-        url: "/system/create",
-        data: {
-          systemId: this.checkSystemNode.systemId,
-          systemName: this.checkSystemNode.systemName,
-          preId: this.checkSystemNode.preId,
-          systemDescription: this.checkSystemNode.systemDescription,
-        },
-      })
-        .then(({ data }) => {
-          this.submitLoading = false;
-          this.showEdit = false;
-          alert(data.message);
-          this.checkSystemTreeGet();
+      if (this.selectAction) {
+        //编辑合约
+        service({
+          url: "/system/update",
+          data: {
+            systemId: this.checkSystemNode.systemId,
+            systemName: this.checkSystemNode.systemName,
+            preId: this.checkSystemNode.preId,
+            systemDescription: this.checkSystemNode.systemDescription,
+          },
         })
-        .catch(() => {
-          this.submitLoading = false;
-          alert("失败");
-        });
+          .then(({ data }) => {
+            this.submitLoading = false;
+            this.showEdit = false;
+            alert(data.message);
+            this.checkSystemTreeGet();
+          })
+          .catch(() => {
+            this.submitLoading = false;
+            alert("失败");
+          });
+      } else {
+        //新增合约
+        service({
+          url: "/system/create",
+          data: {
+            systemId: this.checkSystemNode.systemId,
+            systemName: this.checkSystemNode.systemName,
+            preId: this.checkSystemNode.preId,
+            systemDescription: this.checkSystemNode.systemDescription,
+          },
+        })
+          .then(({ data }) => {
+            this.submitLoading = false;
+            this.showEdit = false;
+            alert(data.message);
+            this.checkSystemTreeGet();
+          })
+          .catch(() => {
+            this.submitLoading = false;
+            alert("失败");
+          });
+      }
     },
 
     checkSystemTreeGet() {
@@ -236,7 +277,6 @@ export default {
       })
         .then(({ data }) => {
           console.log(data);
-          //resultTotal为总数据条数，resultList为数据列表
           this.checkSystemTree = data.tree;
         })
         .catch((e) => {});
