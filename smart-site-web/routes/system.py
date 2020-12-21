@@ -11,7 +11,7 @@ import db
 bp = Blueprint("system", __name__, url_prefix="/system")
 
 
-@bp.route("/getList", methods=("POST",))
+@bp.route("/getTree", methods=("POST",))
 def get_system():
     table = db.CheckSystemInfo()
     check_system_list = table.get_all()
