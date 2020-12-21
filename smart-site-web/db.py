@@ -478,7 +478,9 @@ class CheckSystemInfo:
             return True
         return False
 
-    def insert(self, system_id, system_name, pre_id, system_description):
+    def insert(
+        self, system_id: str, system_name: str, pre_id: str, system_description: str
+    ):
         """
         向检查体系树中插入一个节点
         :param system_id: 当前检查体系ID
