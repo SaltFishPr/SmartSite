@@ -4,6 +4,7 @@
 # @date: 2020/12/2
 import random
 import string
+import pickle
 
 
 def id_to_key(table_name: str, iid) -> str:
@@ -28,5 +29,9 @@ def page_size_convert(page: int, size: int, length: int) -> (int, int):
     return start, end
 
 
-def pic_to_str():
-    pass
+def pic_to_str(f):
+    return pickle.dumps(f)
+
+
+def str_to_pic(pic_str):
+    return pickle.loads(pic_str)

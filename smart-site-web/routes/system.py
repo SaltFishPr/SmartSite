@@ -74,3 +74,51 @@ def update_system():
     ):
         return {"message": "更新成功", "flag": True}
     return {"message": "更新失败", "flag": False}
+
+
+@bp.route("/get_first_route", methods=("POST",))
+def get_first_route():
+    table = db.CheckSystemInfo()
+    check_system_list = table.get_all()
+    first_system = []
+    id_list = []
+    for system_item in check_system_list:
+        if system_item["pre_id"] == "0":
+            first_system.append(system_item["system_description"])
+            id_list.append(system_item["system_id"])
+    return json.dumps({"first_system": first_system, "id_list": id_list})
+
+
+@bp.route("/get_second_route", methods=("POST",))
+def get_send_route():
+    data = json.loads(request.form["data"])
+    first_id = str(data["first_id"])
+    table = db.CheckSystemInfo()
+    check_system_list = table.get_all()
+    sencond_system = []
+    id_list = []
+    for system_item in check_system_list:
+        if system_item["pre_id"] == first_id:
+            sencond_system.append(system_item["system_description"])
+            id_list.append(system_item["system_id"])
+    return json.dumps({"sencond_system": sencond_system, "id_list": id_list})
+
+
+@bp.route("/get_third_route", methods=("POST",))
+def get_three_route():
+    data = json.loads(request.form["data"])
+    second_id = str(data["second_id"])
+    table = db.CheckSystemInfo()
+    check_system_list = table.get_all()
+    third_system = []
+    id_list = []
+    for system_item in check_system_list:
+        if system_item["pre_id"] == second_id:
+            third_system.append(system_item["system_description"])
+            id_list.append(system_item["system_id"])
+    return json.dumps({"third_system": third_system, "id_list": id_list})
+
+
+if __name__ == '__main__':
+    tmp = db.CheckSystemInfo()
+    print(get_system())

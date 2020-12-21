@@ -5,7 +5,7 @@
 from flask import Flask
 from flask_cors import *
 
-from routes import auth, client, contract, employee, group, project, system
+from routes import auth, client, contract, employee, group, project, system, check
 
 
 def create_app():
@@ -21,6 +21,7 @@ def create_app():
     app.register_blueprint(group.bp)  # 注册检查小组蓝图
     app.register_blueprint(project.bp)  # 注册项目蓝图
     app.register_blueprint(system.bp)  # 注册检查体系蓝图
+    app.register_blueprint(check.bp)  # 注册接受检查信息蓝图
 
     @app.route("/")
     def index():
