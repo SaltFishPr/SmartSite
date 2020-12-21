@@ -189,7 +189,7 @@ export default {
       this.checkSystemNode = {
         systemId: nodeData.systemId,
         systemName: nodeData.systemName,
-        preId: node.parent.id,
+        preId: node.parent.data.systemId,
         systemDescription: nodeData.systemDescription,
       };
       this.selectAction = true;
