@@ -78,8 +78,10 @@ def get_by_group():
     table = db.ProjectInfo()
     projects = table.get_all()
     rev_id = data["group_id"]
-    project_list = []
+    description_list = []
+    id_list = []
     for project in projects:
         if rev_id == project["projectCheckGroupId"]:
-            project_list.append(project["projectDescription"])
-    return json.dumps({"project_list":project_list})
+            description_list.append(project["projectDescription"])
+            id_list.append(project["projectId"])
+    return json.dumps({"project_list":description_list,"id_list":id_list})

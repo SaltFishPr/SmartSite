@@ -16,7 +16,7 @@ pool = redis.ConnectionPool(
     host=config.redis_host,
     port=config.redis_port,
     decode_responses=True,
-    password=config.redis_password,
+    password=config.redis_password
 )
 
 
@@ -419,6 +419,7 @@ class CheckInfo:
         check_system_route: str,
         employee_id: str,
         problem_description: str,
+        picture: str,
     ) -> bool:
         """
         插入一个检查信息
@@ -426,6 +427,7 @@ class CheckInfo:
         :param check_system_route: 检查体系（例：安全检查->人员安全检查）
         :param employee_id: 检查员员工ID
         :param problem_description: 问题描述
+        :param picture: 序列化后的图片
         :return: 成功返回 True，否则返回 False
         """
         check_id = random_id()  # 生成检查信息ID
@@ -438,6 +440,7 @@ class CheckInfo:
             check_system_route,
             employee_id,
             problem_description,
+            picture,
         ]
         return self.__r.setnx(id_to_key(self.__table_name, check_id), json.dumps(data))
 
@@ -455,7 +458,7 @@ class CheckInfo:
         """
         获取检查信息
         :param check_id: 检查信息ID
-        :return: [检查ID, 项目ID, 检查体系, 问题描述]
+        :return: [检查ID, 项目ID, 检查体系, 问题描述, 图片序列]
         """
         if not self.is_exist(check_id):
             return []
