@@ -54,7 +54,7 @@
         <template v-slot="{ row }">
           <el-link
             :type="row.projectStatus === '进行中' ? 'primary' : 'success'"
-            @click="checkStatusGet()"
+            @click="showCheck = 'true'"
             >{{ row.projectStatus }}</el-link
           >
         </template>
@@ -258,6 +258,54 @@
         >
       </template>
     </vxe-modal>
+
+    <vxe-modal v-model="showCheck" resize>
+      <template v-slot>
+        <el-collapse v-model="checkNames" @change="handleChange">
+          <el-collapse-item title="一致性 Consistency" name="1">
+            <div>
+              与现实生活一致：与现实生活的流程、逻辑保持一致，遵循用户习惯的语言和概念；
+            </div>
+            <el-image
+              style="width: 320px; height: 180px"
+              src="https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg"
+              fit="contain"
+            ></el-image>
+          </el-collapse-item>
+          <el-collapse-item title="反馈 Feedback" name="2">
+            <div>
+              控制反馈：通过界面样式和交互动效让用户可以清晰的感知自己的操作；
+            </div>
+            <el-image
+              style="width: 100px; height: 100px"
+              src="https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg"
+              fit="contain"
+            ></el-image>
+          </el-collapse-item>
+          <el-collapse-item title="效率 Efficiency" name="3">
+            <div>简化流程：设计简洁直观的操作流程；</div>
+            <div>
+              清晰明确：语言表达清晰且表意明确，让用户快速理解进而作出决策；
+            </div>
+            <el-image
+              style="width: 100px; height: 100px"
+              src="https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg"
+              fit="contain"
+            ></el-image>
+          </el-collapse-item>
+          <el-collapse-item title="可控 Controllability" name="4">
+            <div>
+              用户决策：根据场景可给予用户操作建议或安全提示，但不能代替用户进行决策；
+            </div>
+            <el-image
+              style="width: 100px; height: 100px"
+              src="https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg"
+              fit="contain"
+            ></el-image>
+          </el-collapse-item>
+        </el-collapse>
+      </template>
+    </vxe-modal>
   </div>
 </template>
 <script>
@@ -266,6 +314,8 @@ import service from "../utils/request.js";
 export default {
   data() {
     return {
+      showCheck: false,
+      checkNames: [],
       submitLoading: false, //提交动画
       tableLoading: false,
       selectAction: false, //新增0or编辑1
@@ -307,6 +357,10 @@ export default {
     this.projectListGet();
   },
   methods: {
+    handleChange(val) {
+      console.log(val);
+      console.log(this.checkNames);
+    },
     checkStatusGet() {
       console.log(123);
     },

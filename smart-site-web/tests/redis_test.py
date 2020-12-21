@@ -7,5 +7,5 @@ import db
 if __name__ == "__main__":
     # r = redis.Redis(connection_pool=db.pool)
     # print(r.keys())
-    tmp = db.ContractInfo()
-    print(tmp.get_all())
+    tmp = db.UserInfo()
+    print(tmp.insert("aaa", "111", "admin"))
