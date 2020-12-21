@@ -2,12 +2,12 @@
     <h1>{% block title %}Register{% endblock %}</h1>
 {% endblock %} {% block content %}
     <form action="/auth/register" method="post">
-        <label for="username">Username</label>
-        <input name="username" id="username" required/>
+        <label for="account">Account</label>
+        <input name="account" id="account" required/>
         <label for="password">Password</label>
         <input type="password" name="password" id="password" required/>
-        <label for="description">Description</label>
-        <input name="description" id="description" required/>
+        <label for="identity">Identity</label>
+        <input name="identity" id="identity" required/>
         <button type="submit" formaction="/auth/register">Register</button>
     </form>
 {% endblock %}
