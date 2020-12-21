@@ -7,7 +7,6 @@ from typing import List
 from flask import Blueprint, request
 
 import db
-from utils import page_size_convert
 
 bp = Blueprint("system", __name__, url_prefix="/system")
 
@@ -15,17 +14,17 @@ bp = Blueprint("system", __name__, url_prefix="/system")
 @bp.route("/getList", methods=("POST",))
 def get_system():
     table = db.CheckSystemInfo()
-    client_list = table.get_all()
+    check_system_list = table.get_all()
 
-    def get_special(l: List, pre_id: str):
+    def get_special(llist: List, pre_id: str):
         res = []
-        for d in l:
+        for d in llist:
             if d["pre_id"] == pre_id:
                 res.append(d)
         return res
 
     def get_children(system_id: str):
-        children = get_special(client_list, system_id)
+        children = get_special(check_system_list, system_id)
         if not children:
             return []
         res = []
@@ -41,4 +40,35 @@ def get_system():
         return res
 
     data = get_children("0")
-    return data
+    return {"tree": data}
+
+
+@bp.route("/create", methods=("POST",))
+def create_system():
+    data = json.loads(request.form["data"])
+    table = db.CheckSystemInfo()
+    if table.insert(
+        data["systemId"], data["systemName"], data["preId"], data["systemDescription"]
+    ):
+        return {"message": "创建成功", "flag": True}
+    return {"message": "创建失败", "flag": False}
+
+
+@bp.route("/delete", methods=("POST",))
+def delete_system():
+    data = json.loads(request.form["data"])
+    table = db.CheckSystemInfo()
+    if table.delete(data["systemId"]):
+        return {"message": "删除成功", "flag": True}
+    return {"message": "删除失败", "flag": False}
+
+
+@bp.route("/update", methods=("POST",))
+def update_system():
+    data = json.loads(request.form["data"])
+    table = db.CheckSystemInfo()
+    if table.update(
+        data["systemId"], data["systemName"], data["preId"], data["systemDescription"]
+    ):
+        return {"message": "更新成功", "flag": True}
+    return {"message": "更新失败", "flag": False}
