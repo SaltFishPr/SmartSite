@@ -24,7 +24,8 @@ def get_all_employees():
         "resultTotal": length,
         "resultList": employee_list[start:end],
     }
-    return data
+    print(data)
+    return json.dumps(data)
 
 
 @bp.route("/create", methods=("POST",))
@@ -52,3 +53,10 @@ def update_employee():
     if table.update_data(data["employeeId"], data["employeeName"], data["employeeAge"]):
         return {"message": "更新成功", "flag": True}
     return {"message": "更新失败", "flag": False}
+
+
+@bp.route("/get_groups", methods=("POST",))
+def get_groups():
+    data = json.loads(request.form["data"])
+    table = db.EmployeeInfo()
+    return json.dumps({"group_list": table.get_groups(data["employee_id"])})

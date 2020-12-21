@@ -70,3 +70,16 @@ def update_project():
     ):
         return {"message": "更新成功", "flag": True}
     return {"message": "更新失败", "flag": False}
+
+
+@bp.route("/get_by_group", methods=("POST",))
+def get_by_group():
+    data = json.loads(request.form["data"])
+    table = db.ProjectInfo()
+    projects = table.get_all()
+    rev_id = data["group_id"]
+    project_list = []
+    for project in projects:
+        if rev_id == project["projectCheckGroupId"]:
+            project_list.append(project["projectDescription"])
+    return json.dumps({"project_list": project_list})

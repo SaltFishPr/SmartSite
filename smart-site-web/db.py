@@ -478,7 +478,9 @@ class CheckSystemInfo:
             return True
         return False
 
-    def insert(self, system_id, system_name, pre_id, system_description):
+    def insert(
+        self, system_id: str, system_name: str, pre_id: str, system_description: str
+    ):
         """
         向检查体系树中插入一个节点
         :param system_id: 当前检查体系ID
@@ -489,6 +491,27 @@ class CheckSystemInfo:
         """
         data = [system_id, system_name, pre_id, system_description]
         return self.__r.setnx(id_to_key(self.__table_name, system_id), json.dumps(data))
+
+    def update(
+        self,
+        system_id: str,
+        system_name: str,
+        pre_id: str,
+        system_description: str,
+    ) -> bool:
+        """
+        更新合同信息
+        :param system_id: 当前检查体系ID
+        :param system_name: 当前检查体系名称
+        :param pre_id: 前置检查体系ID
+        :param system_description: 检查体系描述
+        :return: 成功返回 True，否则返回 False
+        """
+        data = [system_id, system_name, pre_id, system_description]
+        if not self.is_exist(system_id):
+            return False
+        self.__r.set(id_to_key(self.__table_name, system_id), json.dumps(data))
+        return True
 
     def delete(self, system_id: str) -> bool:
         """
