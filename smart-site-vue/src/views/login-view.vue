@@ -32,6 +32,7 @@ export default {
         .then(({ data }) => {
           if (data.flag) {
             alert(data.message);
+            this.$store.commit("verificationGet", data.verification);
             this.$router.push({ path: "/home" });
           } else {
             alert(data.message);
