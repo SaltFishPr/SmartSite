@@ -31,10 +31,11 @@ export default {
         return;
       }
       service({
-        url: "/register",
+        url: "/auth/register",
         data: {
           account: this.account,
           password: this.password_1,
+          identity: "admin",
         },
       })
         .then(({ data }) => {
