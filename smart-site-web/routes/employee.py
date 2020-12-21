@@ -55,9 +55,8 @@ def update_employee():
     return {"message": "更新失败", "flag": False}
 
 
-@bp.route("/get_groups",methods=("POST",))
+@bp.route("/get_groups", methods=("POST",))
 def get_groups():
     data = json.loads(request.form["data"])
     table = db.EmployeeInfo()
-    return json.dumps({"group_list":table.get_groups(data["employee_id"])})
-
+    return json.dumps({"group_list": table.get_groups(data["employee_id"])})

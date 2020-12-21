@@ -12,6 +12,7 @@ const employeeView = () => import('../views/employee-view.vue')
 const groupView = () => import('../views/group-view.vue')
 const testView = () => import('../views/test-view.vue')
 const clientView = () => import('../views/client-view.vue')
+const systemView = () => import('../views/system-view.vue')
 
 const routes = [{
 	path: '/home',
@@ -37,6 +38,10 @@ const routes = [{
 		path: 'client',
 		name: 'clientView',
 		component: clientView,
+	},{
+		path: 'system',
+		name: 'systemView',
+		component: systemView,
 	}]
 }, {
 	path: '/login',

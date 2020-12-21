@@ -4,7 +4,8 @@
     <router-link to="/home/project">项目管理</router-link> |
     <router-link to="/home/employee">人员管理</router-link> |
     <router-link to="/home/group">小组管理</router-link> |
-    <router-link to="/home/client">委托方管理</router-link>
+    <router-link to="/home/client">委托方管理</router-link> |
+    <router-link to="/home/system">检查体系管理</router-link>
     <router-view></router-view>
   </div>
 </template>

@@ -27,5 +27,6 @@ def page_size_convert(page: int, size: int, length: int) -> (int, int):
     end = page * size if page * size <= length else length
     return start, end
 
+
 def pic_to_str():
     pass
