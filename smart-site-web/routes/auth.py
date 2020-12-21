@@ -79,38 +79,33 @@ def login():
     return render_template("auth/login.html")
 
 
-@bp.route("/login_or_register", methods=("POST",))
-def login_or_register():
+@bp.route("/employee_login", methods=("POST",))
+def employee_login():
     """
     安卓端的登陆或注册按钮，如果存在用户登陆，如果不存在则进行注册。
     """
-    username = request.form["username"]
-    password = request.form["password"]
+    employee_id = request.form["employee_id"]
+    employee_name = request.form["employee_name"]
     data = {
         "message": "未执行操作",
         "ret_code": -4,
     }
 
-    table = db.UserInfo()
-    user = table.get(username)
-    if table.is_exist(username):  # 如果存在该用户则进行登陆操作
-        if user[1] == password:
+    table = db.EmployeeInfo()
+    employee = table.get_data(employee_id)
+    if table.is_exist(employee_id):  # 如果存在该用户ID则进行登陆操作
+        if employee[1] == employee_name:
             data["message"] = "登陆成功"
             data["ret_code"] = 1
             return json.dumps(data)
         else:
-            data["message"] = "密码错误，请重新输入"
+            data["message"] = "用户名错误，请重新输入"
             data["ret_code"] = -1
             return json.dumps(data)
-    else:  # 如果不存在该用户进行注册操作
-        if table.insert(username, password, "Android"):
-            data["message"] = "为你注册成功"
-            data["ret_code"] = 0
-            return json.dumps(data)
-        else:
-            data["message"] = "注册失败，请重新注册"
-            data["ret_code"] = -2
-            return json.dumps(data)
+    else:  # 如果不存在该用户则进行提示
+        data["message"] = "请联系管理员注册"
+        data["ret_code"] = -2
+        return json.dumps(data)
 
 
 @bp.before_app_request  # 注册一个在视图函数之前运行的函数，不论其 URL 是什么
