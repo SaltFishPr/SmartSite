@@ -23,7 +23,7 @@ export default {
   methods: {
     login() {
       service({
-        url: "/login",
+        url: "/auth/login",
         data: {
           account: this.account,
           password: this.password,
