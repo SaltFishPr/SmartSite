@@ -7,11 +7,13 @@ from typing import List
 from flask import Blueprint, request
 
 import db
+from routes.auth import login_required
 
 bp = Blueprint("system", __name__, url_prefix="/system")
 
 
 @bp.route("/getTree", methods=("POST",))
+@login_required
 def get_system():
     table = db.CheckSystemInfo()
     check_system_list = table.get_all()

@@ -5,6 +5,6 @@
 import requests
 
 if __name__ == "__main__":
-    data = {"username": "saltfish", "password": "123", "description": "description"}
-    response = requests.post("http://192.168.31.199:8000/auth/register", data=data)
+    data = {"verification": "jl"}
+    response = requests.post("http://192.168.31.177:8000/system/getTree", data=data)
     print(response.text)

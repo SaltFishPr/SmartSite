@@ -804,6 +804,31 @@ class GroupInfo:
         return res
 
 
+class VerificationInfo:
+    def __init__(self):
+        """初始化表信息"""
+        self.__table_name = "VerificationInfo"  # 表名
+        self.__r = redis.Redis(connection_pool=pool)
+
+    def __del__(self):
+        self.__r.close()
+
+    def is_exist(self, verification: str) -> bool:
+        if self.__r.exists(id_to_key(self.__table_name, verification)) == 1:
+            return True
+        return False
+
+    def insert(self, verification) -> bool:
+        return self.__r.set(
+            id_to_key(self.__table_name, verification), verification, ex=86400, nx=True
+        )
+
+    def delete(self, verification: str) -> bool:
+        if self.__r.delete(id_to_key(self.__table_name, verification)) == 1:
+            return True
+        return False
+
+
 def get_all_groups():
     r = redis.Redis(connection_pool=pool)
     contracts = r.keys(pattern="GroupInfo:*")

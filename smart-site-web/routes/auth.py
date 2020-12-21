@@ -8,75 +8,67 @@
 """
 import functools
 
-from flask import (
-    Blueprint,
-    flash,
-    g,
-    redirect,
-    render_template,
-    request,
-    session,
-    url_for,
-    json,
-)
+from flask import Blueprint, request, session, json, g
 
 import db
+from utils import random_id
 
 bp = Blueprint("auth", __name__, url_prefix="/auth")  # url_prefix 会添加到所有与该蓝图关联的 URL 前面
 
 
-@bp.route("/register", methods=("GET", "POST"))
+@bp.route("/register", methods=("POST",))
 def register():
-    if request.method == "POST":
-        account = request.form["account"]
-        password = request.form["password"]
-        identity = request.form["identity"]
-        table = db.UserInfo()
-        error = None
+    account = request.form["account"]
+    password = request.form["password"]
+    identity = request.form["identity"]
+    table = db.UserInfo()
+    error = None
 
-        if not account:
-            error = "Username is required."
-        elif not password:
-            error = "Password is required."
-        elif table.is_exist(account):
-            error = "User {} is already registered.".format(account)
+    if not account:
+        error = "Username is required."
+    elif not password:
+        error = "Password is required."
+    elif table.is_exist(account):
+        error = "User {} is already registered.".format(account)
 
-        if error is None:
-            table.insert(account, password, identity)
-            return redirect(url_for("auth.login"))
+    if error is None:
+        table.insert(account, password, identity)
+        return {"message": "Register successfully", "flag": True}
 
-        flash(error)  # 用于储存在渲染模块时可以调用的信息
-
-    return render_template("auth/register.html")  # 渲染一个包含 HTML 的模板
+    return {"message": error, "flag": False}
 
 
-@bp.route("/login", methods=("GET", "POST"))
+@bp.route("/login", methods=("POST",))
 def login():
     """
     进行登录验证
     :return:
     """
-    if request.method == "POST":
-        account = request.form["account"]
-        password = request.form["password"]
-        table = db.UserInfo()
-        error = None
-        user = table.get(account)
+    data = json.loads(request.form["data"])
+    account = data["account"]
+    password = data["password"]
+    table = db.UserInfo()
+    error = None
+    user = table.get(account)
 
-        if not table.is_exist(account) or user == [] or user[1] != password:
-            error = "Incorrect username or password."
+    if not table.is_exist(account) or user == [] or user[1] != password:
+        error = "Incorrect username or password."
 
-        if user[2] != "admin":
-            error = "Non administrator account"
+    if user[2] != "admin":
+        error = "Non administrator account"
 
-        if error is None:
-            session.clear()
-            session["account"] = user[0]
-            return redirect(url_for("index"))
+    if error is None:
+        session.clear()
+        verification = random_id()
+        verification_table = db.VerificationInfo()
+        verification_table.insert(verification)
+        return {
+            "message": "Login successfully",
+            "flag": True,
+            "verification": verification,
+        }
 
-        flash(error)
-
-    return render_template("auth/login.html")
+    return {"message": error, "flag": False}
 
 
 @bp.route("/employee_login", methods=("POST",))
@@ -108,25 +100,13 @@ def employee_login():
         return json.dumps(data)
 
 
-@bp.before_app_request  # 注册一个在视图函数之前运行的函数，不论其 URL 是什么
-def load_logged_in_user():
-    """
-    检查用户 id 是否已经储存在 session 中，并从数据库中获取用户数据，然后储存在 g.user 中。
-    g.user 的持续时间比请求要长。如果没有用户 id ，或者 id 不存在，那么 g.user 将会是 None 。
-    :return: Nothing
-    """
-    account = session.get("account")
-
-    if account is None:
-        g.user = None
-    else:
-        g.user = db.UserInfo().get(account)
-
-
 @bp.route("/logout")
 def logout():
-    session.clear()
-    return redirect(url_for("index"))
+    verification_table = db.VerificationInfo()
+    if verification_table.delete(request.form["verification"]):
+        return {"message": "Logout successfully", "flag": True}
+    else:
+        return {"message": "Logout failed", "flag": False}
 
 
 def login_required(view):
@@ -134,8 +114,10 @@ def login_required(view):
 
     @functools.wraps(view)
     def wrapped_view(**kwargs):
-        if g.user is None:
-            return redirect(url_for("auth.login"))
+        verification = request.form["verification"]
+        verification_table = db.VerificationInfo()
+        if not verification_table.is_exist(verification):
+            return {"message": "请先登录", "flag": False}
         return view(**kwargs)
 
     return wrapped_view
