@@ -99,6 +99,8 @@ def get_send_route():
         if system_item["pre_id"] == first_id:
             sencond_system.append(system_item["system_description"])
             id_list.append(system_item["system_id"])
+    print(sencond_system)
+    print(id_list)
     return json.dumps({"sencond_system": sencond_system, "id_list": id_list})
 
 
