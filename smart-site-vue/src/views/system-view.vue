@@ -6,20 +6,38 @@
       default-expand-all
       :expand-on-click-node="false"
     >
-      <span slot-scope="{ node, data }">
-        <span :title="data.systemDescription">{{ data.systemName }}</span>
-        <span>
-          <el-button type="text" size="mini" @click="() => append(data)">
-            Append
+      <el-row slot-scope="{ node, data }" type="flex">
+        <el-tooltip :content="data.systemDescription" placement="right">
+          <el-col>{{ data.systemName }}</el-col>
+        </el-tooltip>
+        <el-col :offset="12">
+          <el-button
+            type="text"
+            size="mini"
+            @click="() => append(data)"
+            icon="el-icon-plus"
+          >
           </el-button>
-          <el-button type="text" size="mini" @click="() => remove(data)">
-            Delete
+        </el-col>
+        <el-col :offset="4">
+          <el-button
+            type="text"
+            size="mini"
+            @click="() => update(node, data)"
+            icon="el-icon-edit"
+          >
           </el-button>
-          <el-button type="text" size="mini" @click="() => update(node, data)">
-            Update
+        </el-col>
+        <el-col :offset="4">
+          <el-button
+            type="text"
+            size="mini"
+            @click="() => remove(data)"
+            icon="el-icon-delete"
+          >
           </el-button>
-        </span>
-      </span>
+        </el-col>
+      </el-row>
     </el-tree>
 
     <vxe-modal
