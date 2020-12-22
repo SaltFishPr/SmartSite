@@ -59,4 +59,5 @@ def update_employee():
 def get_groups():
     data = json.loads(request.form["data"])
     table = db.EmployeeInfo()
+    print(table.get_groups(data["employee_id"]))
     return json.dumps({"group_list": table.get_groups(data["employee_id"])})

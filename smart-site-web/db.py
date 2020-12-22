@@ -3,6 +3,7 @@
 # @file: db.py
 # @date: 2020/12/2
 import json
+import os
 import time
 from typing import List
 
@@ -419,7 +420,7 @@ class CheckInfo:
         check_system_route: str,
         employee_id: str,
         problem_description: str,
-        picture: str,
+        picture,
     ) -> bool:
         """
         插入一个检查信息
@@ -440,9 +441,9 @@ class CheckInfo:
             check_system_route,
             employee_id,
             problem_description,
-            picture,
         ]
-        return self.__r.setnx(id_to_key(self.__table_name, check_id), json.dumps(data))
+        picture.save("checkfiles/"+check_id+".jpg")
+        return self.__r.set(id_to_key(self.__table_name, check_id), json.dumps(data))
 
     def delete(self, check_id: str) -> bool:
         """

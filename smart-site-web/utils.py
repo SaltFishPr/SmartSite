@@ -5,6 +5,7 @@
 import random
 import string
 import pickle
+import base64
 
 
 def id_to_key(table_name: str, iid) -> str:
@@ -35,3 +36,11 @@ def pic_to_str(f):
 
 def str_to_pic(pic_str):
     return pickle.loads(pic_str)
+
+
+def pic_to_str64(f):
+    return base64.b64encode(f)
+
+
+def str_to_pic64(pic_str):
+    return base64.b64decode(pic_str)
