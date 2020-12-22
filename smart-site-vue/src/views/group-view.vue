@@ -1,34 +1,52 @@
 <template>
   <div>
-    <vxe-form :data="searchData" @submit="searchEvent" @reset="searchReset">
-      <vxe-form-item
-        field="name"
-        :item-render="{
-          name: 'input',
-          attrs: { placeholder: '请输入名称' },
-        }"
-      ></vxe-form-item>
-      <vxe-form-item
-        :item-render="{
-          name: '$buttons',
-          children: [
-            {
-              props: {
-                type: 'submit',
-                content: '查询',
-                status: 'primary',
-              },
-            },
-            { props: { type: 'reset', content: '重置' } },
-          ],
-        }"
-      ></vxe-form-item>
-    </vxe-form>
-    <vxe-toolbar>
-      <template v-slot:buttons>
-        <vxe-button icon="fa fa-plus" @click="groupAdd()">新增小组</vxe-button>
-      </template>
-    </vxe-toolbar>
+    <el-row type="flex" justify="center"
+      ><el-col :span="4"><h3>小组管理</h3></el-col></el-row
+    >
+    <el-row
+      ><el-col :span="12">
+        <el-row type="flex"
+          ><vxe-toolbar>
+            <template v-slot:buttons>
+              <vxe-button icon="fa fa-plus" @click="groupAdd()"
+                >新增小组</vxe-button
+              >
+            </template>
+          </vxe-toolbar></el-row
+        >
+      </el-col>
+
+      <el-col :span="12">
+        <el-row type="flex" justify="end">
+          <vxe-form
+            :data="searchData"
+            @submit="searchEvent"
+            @reset="searchReset"
+          >
+            <vxe-form-item
+              field="name"
+              :item-render="{
+                name: 'input',
+                attrs: { placeholder: '请输入名称' },
+              }"
+            ></vxe-form-item>
+            <vxe-form-item
+              :item-render="{
+                name: '$buttons',
+                children: [
+                  {
+                    props: {
+                      type: 'submit',
+                      content: '查询',
+                      status: 'primary',
+                    },
+                  },
+                  { props: { type: 'reset', content: '重置' } },
+                ],
+              }"
+            ></vxe-form-item> </vxe-form
+        ></el-row> </el-col
+    ></el-row>
 
     <vxe-table
       border
