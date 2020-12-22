@@ -23,8 +23,11 @@ def get_pic():
 
 @bp.route("/getText", methods=("POST",))
 def get_text():
-    data = request.form["Text"]
-    print(data)
+    problem_description = request.form["problem_description"]
+    project_id = request.form["project_id"]
+    employee_id = request.form["employee_id"]
+    check_system_route = request.form["check_system_route"]
+    print(project_id,employee_id,problem_description,check_system_route)
     return '文本测试'
 
 
