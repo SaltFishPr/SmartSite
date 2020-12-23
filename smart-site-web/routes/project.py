@@ -80,11 +80,19 @@ def get_by_group():
     rev_id = data["group_id"]
     description_list = []
     id_list = []
+    check_id_list = []
     for project in projects:
         if rev_id == project["projectCheckGroupId"]:
             description_list.append(project["projectDescription"])
             id_list.append(project["projectId"])
-    return json.dumps({"project_list": description_list, "id_list": id_list})
+            check_id_list.append(project["projectCheckSystemID"])
+    return json.dumps(
+        {
+            "project_list": description_list,
+            "id_list": id_list,
+            "check_id_list": check_id_list,
+        }
+    )
 
 
 @bp.route("/getCheckInfo", methods=("POST",))

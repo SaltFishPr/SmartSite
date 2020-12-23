@@ -111,6 +111,14 @@ def get_three_route():
     return json.dumps({"third_system": third_system, "id_list": id_list})
 
 
-if __name__ == "__main__":
-    tmp = db.CheckSystemInfo()
-    print(get_system())
+@bp.route("/get_check_info", methods=("POST",))
+def get_check_info():
+    data = json.loads(request.form["data"])
+    check_info_id = str(data["check_info_id"])
+    table = db.CheckSystemInfo()
+    check_system_list = table.get_all()
+    first_system = "该项目未匹配到相应检查体系"
+    for system_item in check_system_list:
+        if system_item["system_id"] == check_info_id:
+            first_system = system_item["system_description"]
+    return json.dumps({"first_system": first_system})
