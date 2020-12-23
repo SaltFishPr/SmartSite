@@ -85,3 +85,39 @@ def get_by_group():
             description_list.append(project["projectDescription"])
             id_list.append(project["projectId"])
     return json.dumps({"project_list": description_list, "id_list": id_list})
+
+
+@bp.route("/getCheckInfo", methods=("POST",))
+def get_check_info():
+    data = json.loads(request.form["data"])
+    project_id = data["projectId"]
+    system_id = data["systemId"]
+    check_system_table = db.CheckSystemInfo()
+    check_table = db.CheckInfo()
+
+    checks = []
+    system_list = check_system_table.get_children(system_id)
+    for system in system_list:
+        check_id = f"{project_id}-{system_id}-{system['system_id']}"
+        check_info = check_table.get(check_id)
+        if check_info:
+            employee_name = db.EmployeeInfo().get_data(check_info[3])[1]
+            description = check_info[4]
+            checks.append(
+                {
+                    "title": system["system_name"],
+                    "pic": f"{db.checkfiles_path}/{check_id}.jpg",
+                    "employeeName": employee_name,
+                    "description": description,
+                }
+            )
+        else:
+            checks.append(
+                {
+                    "title": system["system_name"],
+                    "pic": "",
+                    "employeeName": "",
+                    "description": "",
+                }
+            )
+    return {"checks": checks, "flag": True}

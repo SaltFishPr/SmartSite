@@ -16,17 +16,9 @@ bp = Blueprint("system", __name__, url_prefix="/system")
 @login_required
 def get_system():
     table = db.CheckSystemInfo()
-    check_system_list = table.get_all()
 
-    def get_special(llist: List, pre_id: str):
-        res = []
-        for d in llist:
-            if d["pre_id"] == pre_id:
-                res.append(d)
-        return res
-
-    def get_children(system_id: str):
-        children = get_special(check_system_list, system_id)
+    def generate(system_id: str):
+        children = table.get_children(system_id)
         if not children:
             return []
         res = []
@@ -36,12 +28,12 @@ def get_system():
                     "systemId": child["system_id"],
                     "systemName": child["system_name"],
                     "systemDescription": child["system_description"],
-                    "children": get_children(child["system_id"]),
+                    "children": generate(child["system_id"]),
                 }
             )
         return res
 
-    data = get_children("0")
+    data = generate("0")
     return {"tree": data}
 
 
@@ -119,6 +111,6 @@ def get_three_route():
     return json.dumps({"third_system": third_system, "id_list": id_list})
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     tmp = db.CheckSystemInfo()
     print(get_system())

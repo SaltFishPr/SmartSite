@@ -5,10 +5,12 @@
 import db
 import redis
 import os
-if __name__ == "__main__":
 
-    print(os.getcwd())
-    # tmp = db.CheckSystemInfo()
+if __name__ == "__main__":
+    r = redis.Redis(connection_pool=db.pool)
+    check_keys = r.keys(pattern="CheckInfo:*")
+    for check_key in check_keys:
+        r.delete(check_key)
     # print(tmp.insert("1", "检查1", "0", "jiancha1"))
     # print(tmp.insert("2", "检查2", "0", "jiancha2"))
     # print(tmp.insert("3", "检查3", "0", "jiancha3"))

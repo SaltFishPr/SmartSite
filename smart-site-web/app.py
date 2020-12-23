@@ -15,13 +15,13 @@ def create_app():
     app.config.from_mapping(SECRET_KEY="dev")
 
     app.register_blueprint(auth.bp)  # 注册认证蓝图
+    app.register_blueprint(check.bp)  # 注册接受检查信息蓝图
     app.register_blueprint(client.bp)  # 注册委托方蓝图
     app.register_blueprint(contract.bp)  # 注册合同蓝图
     app.register_blueprint(employee.bp)  # 注册员工蓝图
     app.register_blueprint(group.bp)  # 注册检查小组蓝图
     app.register_blueprint(project.bp)  # 注册项目蓝图
     app.register_blueprint(system.bp)  # 注册检查体系蓝图
-    app.register_blueprint(check.bp)  # 注册接受检查信息蓝图
 
     @app.route("/")
     def index():

@@ -20,6 +20,14 @@ pool = redis.ConnectionPool(
     password=config.redis_password,
 )
 
+print(os.getcwd())
+
+checkfiles_path = os.path.join(os.getcwd(), "checkfiles")
+
+
+if not os.path.exists(checkfiles_path):
+    os.makedirs(checkfiles_path)
+
 
 class UserInfo:
     """用户信息表：用户名，密码，用户身份"""
@@ -416,6 +424,7 @@ class CheckInfo:
 
     def insert(
         self,
+        check_id: str,
         project_id: str,
         check_system_route: str,
         employee_id: str,
@@ -424,6 +433,7 @@ class CheckInfo:
     ) -> bool:
         """
         插入一个检查信息
+        :param check_id: 检查信息ID
         :param project_id: 项目ID
         :param check_system_route: 检查体系（例：安全检查->人员安全检查）
         :param employee_id: 检查员员工ID
@@ -431,9 +441,6 @@ class CheckInfo:
         :param picture: 序列化后的图片
         :return: 成功返回 True，否则返回 False
         """
-        check_id = random_id()  # 生成检查信息ID
-        while self.is_exist(check_id):
-            check_id = random_id()
 
         data = [
             check_id,
@@ -442,7 +449,7 @@ class CheckInfo:
             employee_id,
             problem_description,
         ]
-        picture.save("checkfiles/"+check_id+".jpg")
+        picture.save(f"{checkfiles_path}/{check_id}.jpg")
         return self.__r.set(id_to_key(self.__table_name, check_id), json.dumps(data))
 
     def delete(self, check_id: str) -> bool:
@@ -459,11 +466,19 @@ class CheckInfo:
         """
         获取检查信息
         :param check_id: 检查信息ID
-        :return: [检查ID, 项目ID, 检查体系, 问题描述, 图片序列]
+        :return: [检查信息ID, 项目ID, 检查体系, 用户ID, 问题描述]
         """
         if not self.is_exist(check_id):
             return []
         return json.loads(self.__r.get(id_to_key(self.__table_name, check_id)))
+
+    def search(self, search_key):
+        check_keys = self.__r.keys(pattern=f"CheckInfo:{search_key}*")
+        res = []
+        for check_key in check_keys:
+            tmp = self.get(check_key)
+            res.append(tmp)
+        return res
 
 
 class CheckSystemInfo:
@@ -551,6 +566,13 @@ class CheckSystemInfo:
                     "system_description": tmp_data[3],  # 检查体系描述
                 }
             )
+        return res
+
+    def get_children(self, pre_id: str):
+        res = []
+        for d in self.get_all():
+            if d["pre_id"] == pre_id:
+                res.append(d)
         return res
 
 
