@@ -296,7 +296,7 @@ class ProjectInfo:
                 {
                     "projectId": data[0],
                     "clientId": data[1],
-                    "projectCheckSystemID": data[2],
+                    "projectCheckSystemId": data[2],
                     "projectStatus": data[3],
                     "projectRiskValue": data[4],
                     "projectCreationTime": data[5],
