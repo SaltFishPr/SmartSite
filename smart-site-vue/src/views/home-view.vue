@@ -13,9 +13,21 @@
             active-text-color="#0080ff"
             @select="handleSelect"
           >
+            <el-menu-item index="/home/contract">
+              <i class="el-icon-document"></i>
+              <span slot="title">合同管理</span>
+            </el-menu-item>
+            <el-menu-item index="/home/client">
+              <i class="el-icon-school"></i>
+              <span slot="title">委托方管理</span>
+            </el-menu-item>
+            <el-menu-item index="/home/project">
+              <i class="el-icon-office-building"></i>
+              <span slot="title">项目管理</span>
+            </el-menu-item>
             <el-submenu index="1">
               <template slot="title">
-                <i class="el-icon-location"></i>
+                <i class="el-icon-user"></i>
                 <span>员工管理</span>
               </template>
               <el-menu-item-group>
@@ -24,24 +36,9 @@
               </el-menu-item-group>
             </el-submenu>
 
-            <el-menu-item index="/home/client">
-              <i class="el-icon-menu"></i>
-              <span slot="title">委托方管理</span>
-            </el-menu-item>
-
             <el-menu-item index="/home/system">
-              <i class="el-icon-document"></i>
+              <i class="el-icon-tickets"></i>
               <span slot="title">检查体系管理</span>
-            </el-menu-item>
-
-            <el-menu-item index="/home/project">
-              <i class="el-icon-setting"></i>
-              <span slot="title">项目管理</span>
-            </el-menu-item>
-
-            <el-menu-item index="/home/contract">
-              <i class="el-icon-setting"></i>
-              <span slot="title">合同管理</span>
             </el-menu-item>
           </el-menu>
         </el-row>

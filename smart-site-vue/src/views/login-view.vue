@@ -80,7 +80,7 @@ export default {
           if (data.flag) {
             alert(data.message);
             this.$store.commit("verificationGet", data.verification);
-            this.$router.push({ path: "/home" });
+            this.$router.push({ path: "/home/contract" });
           } else {
             alert(data.message);
           }
