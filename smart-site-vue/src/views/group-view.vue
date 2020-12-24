@@ -1,53 +1,5 @@
 <template>
   <div>
-    <el-row type="flex" justify="center"
-      ><el-col :span="4"><h3>小组管理</h3></el-col></el-row
-    >
-    <el-row
-      ><el-col :span="12">
-        <el-row type="flex"
-          ><vxe-toolbar>
-            <template v-slot:buttons>
-              <vxe-button icon="fa fa-plus" @click="groupAdd()"
-                >新增小组</vxe-button
-              >
-            </template>
-          </vxe-toolbar></el-row
-        >
-      </el-col>
-
-      <el-col :span="12">
-        <el-row type="flex" justify="end">
-          <vxe-form
-            :data="searchData"
-            @submit="searchEvent"
-            @reset="searchReset"
-          >
-            <vxe-form-item
-              field="name"
-              :item-render="{
-                name: 'input',
-                attrs: { placeholder: '请输入名称' },
-              }"
-            ></vxe-form-item>
-            <vxe-form-item
-              :item-render="{
-                name: '$buttons',
-                children: [
-                  {
-                    props: {
-                      type: 'submit',
-                      content: '查询',
-                      status: 'primary',
-                    },
-                  },
-                  { props: { type: 'reset', content: '重置' } },
-                ],
-              }"
-            ></vxe-form-item> </vxe-form
-        ></el-row> </el-col
-    ></el-row>
-
     <vxe-table
       border
       resizable
@@ -83,24 +35,41 @@
       </vxe-table-column>
     </vxe-table>
 
-    <vxe-pager
-      border
-      size="medium"
-      :loading="tableLoading"
-      :current-page="groupPage.currentPage"
-      :page-size="groupPage.pageSize"
-      :total="groupPage.totalResult"
-      :layouts="[
-        'PrevPage',
-        'JumpNumber',
-        'NextPage',
-        'FullJump',
-        'Sizes',
-        'Total',
-      ]"
-      @page-change="handlePageChange"
-    >
-    </vxe-pager>
+    <el-row>
+      <el-col :span="24">
+        <el-row type="flex" justify="center">
+          <vxe-pager
+            border
+            size="medium"
+            :loading="tableLoading"
+            :current-page="groupPage.currentPage"
+            :page-size="groupPage.pageSize"
+            :total="groupPage.totalResult"
+            :layouts="[
+              'PrevPage',
+              'JumpNumber',
+              'NextPage',
+              'FullJump',
+              'Sizes',
+              'Total',
+            ]"
+            @page-change="handlePageChange"
+          >
+          </vxe-pager>
+        </el-row>
+      </el-col>
+      <el-col :span="24">
+        <el-row type="flex" justify="center">
+          <vxe-toolbar>
+            <template v-slot:buttons>
+              <vxe-button icon="fa fa-plus" @click="groupAdd()"
+                >新增小组</vxe-button
+              >
+            </template>
+          </vxe-toolbar>
+        </el-row>
+      </el-col>
+    </el-row>
 
     <vxe-modal
       v-model="showEdit"
@@ -182,9 +151,7 @@ export default {
         totalResult: 0,
         searchKey: "",
       },
-      searchData: {
-        name: "",
-      },
+
       group: {
         //小组
         groupId: null,
@@ -223,10 +190,11 @@ export default {
       this.groupListGet();
     },
 
-    searchEvent() {
+    searchEvent(searchInput) {
       //更新搜索词
-      this.groupPage.currentPage = 1;
-      this.groupPage.searchKey = this.searchData.name;
+      console.log(searchInput);
+      this.contractPage.currentPage = 1;
+      this.contractPage.searchKey = searchInput;
       this.groupListGet();
     },
     handlePageChange({ currentPage, pageSize }) {

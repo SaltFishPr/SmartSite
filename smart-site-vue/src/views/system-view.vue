@@ -1,10 +1,5 @@
 <template>
   <div>
-    <el-row type="flex" justify="center">
-      <el-col :span="4">
-        <h3>检查体系管理</h3>
-      </el-col>
-    </el-row>
     <el-tree
       :data="checkSystemTree"
       node-key="systemId"

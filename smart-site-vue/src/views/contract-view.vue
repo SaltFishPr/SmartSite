@@ -1,54 +1,5 @@
 <template>
   <div>
-    <el-row type="flex" justify="center"
-      ><el-col :span="4"><h3>合同管理</h3></el-col></el-row
-    >
-    <el-row
-      ><el-col :span="12">
-        <el-row type="flex">
-          <vxe-toolbar>
-            <template v-slot:buttons>
-              <vxe-button icon="fa fa-plus" @click="contractAdd()"
-                >新增合同</vxe-button
-              >
-            </template>
-          </vxe-toolbar>
-        </el-row>
-      </el-col>
-
-      <el-col :span="12">
-        <el-row type="flex" justify="end">
-          <vxe-form
-            :data="searchData"
-            @submit="searchEvent"
-            @reset="searchReset"
-          >
-            <vxe-form-item
-              field="name"
-              :item-render="{
-                name: 'input',
-                attrs: { placeholder: '请输入名称' },
-              }"
-            ></vxe-form-item>
-            <vxe-form-item
-              :item-render="{
-                name: '$buttons',
-                children: [
-                  {
-                    props: {
-                      type: 'submit',
-                      content: '查询',
-                      status: 'primary',
-                    },
-                  },
-                  { props: { type: 'reset', content: '重置' } },
-                ],
-              }"
-            ></vxe-form-item>
-          </vxe-form>
-        </el-row> </el-col
-    ></el-row>
-
     <vxe-table
       border
       resizable
@@ -88,24 +39,41 @@
       </vxe-table-column>
     </vxe-table>
 
-    <vxe-pager
-      border
-      size="medium"
-      :loading="tableLoading"
-      :current-page="contractPage.currentPage"
-      :page-size="contractPage.pageSize"
-      :total="contractPage.totalResult"
-      :layouts="[
-        'PrevPage',
-        'JumpNumber',
-        'NextPage',
-        'FullJump',
-        'Sizes',
-        'Total',
-      ]"
-      @page-change="handlePageChange"
-    >
-    </vxe-pager>
+    <el-row>
+      <el-col :span="24">
+        <el-row type="flex" justify="center">
+          <vxe-pager
+            border
+            size="medium"
+            :loading="tableLoading"
+            :current-page="contractPage.currentPage"
+            :page-size="contractPage.pageSize"
+            :total="contractPage.totalResult"
+            :layouts="[
+              'PrevPage',
+              'JumpNumber',
+              'NextPage',
+              'FullJump',
+              'Sizes',
+              'Total',
+            ]"
+            @page-change="handlePageChange"
+          >
+          </vxe-pager>
+        </el-row>
+      </el-col>
+      <el-col :span="24">
+        <el-row type="flex" justify="center">
+          <vxe-toolbar>
+            <template v-slot:buttons>
+              <vxe-button icon="fa fa-plus" @click="contractAdd()"
+                >新增合同</vxe-button
+              >
+            </template>
+          </vxe-toolbar>
+        </el-row>
+      </el-col>
+    </el-row>
 
     <vxe-modal
       v-model="showEdit"
@@ -206,9 +174,7 @@ export default {
         totalResult: 0,
         searchKey: "",
       },
-      searchData: {
-        name: "",
-      },
+
       contract: {
         //合约
         contractId: null,
@@ -236,10 +202,11 @@ export default {
       this.contractListGet();
     },
 
-    searchEvent() {
+    searchEvent(searchInput) {
       //更新搜索词
+      console.log(searchInput);
       this.contractPage.currentPage = 1;
-      this.contractPage.searchKey = this.searchData.name;
+      this.contractPage.searchKey = searchInput;
       this.contractListGet();
     },
     handlePageChange({ currentPage, pageSize }) {

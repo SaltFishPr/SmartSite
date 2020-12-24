@@ -1,117 +1,20 @@
 <template>
   <div class="login">
-    <div class="content">
-      <div class="content_input">
-        <div class="title">
-          <p>{{ selectAction ? "注册" : "管理员登录" }}</p>
-        </div>
-        <el-input v-model="account" clearable placeholder="用户名"></el-input>
-        <el-input
-          v-model="password"
-          clearable
-          show-password
-          placeholder="密码"
-        ></el-input>
-        <el-input
-          v-model="passwordConfirm"
-          clearable
-          show-password
-          placeholder="确认密码"
-          v-show="selectAction"
-        ></el-input>
-        <div class="content_button">
-          <el-button type="primary" @click="submit">{{
-            selectAction ? "注册" : "登录"
-          }}</el-button>
-        </div>
-        <div class="help" @click="actionChange">
-          {{ selectAction ? "去登录" : "去注册" }}
-        </div>
-      </div>
-    </div>
+    <el-row>
+      <el-col :span="12">
+        <el-row type="flex" justify="start"> toobar </el-row>
+      </el-col>
+      <el-col :span="12">
+        <el-row type="flex" justify="end"> pager </el-row>
+      </el-col>
+    </el-row>
   </div>
 </template>
 
 <script>
 import service from "../utils/request.js";
 
-export default {
-  mounted() {
-    let x = document.querySelector(".login");
-    let y = document.createElement("script");
-    y.setAttribute("src", "/external/ribbon.js");
-    x.appendChild(y);
-    console.log(x);
-  },
-
-  data() {
-    return {
-      account: "",
-      password: "",
-      passwordConfirm: "",
-      selectAction: false, //true为注册,false为登录
-    };
-  },
-  methods: {
-    actionChange() {
-      this.account = "";
-      this.password = "";
-      this.passwordConfirm = "";
-      this.selectAction = !this.selectAction;
-    },
-
-    submit() {
-      if (this.selectAction) this.register();
-      else this.login();
-    },
-
-    login() {
-      service({
-        url: "/auth/login",
-        data: {
-          account: this.account,
-          password: this.password,
-        },
-      })
-        .then(({ data }) => {
-          if (data.flag) {
-            alert(data.message);
-            this.$store.commit("verificationGet", data.verification);
-            this.$router.push({ path: "/home" });
-          } else {
-            alert(data.message);
-          }
-        })
-        .catch((e) => {
-          console.log(e);
-        });
-    },
-    register() {
-      if (this.password !== this.passwordConfirm) {
-        alert("两次密码不一致");
-        return;
-      }
-      service({
-        url: "/auth/register",
-        data: {
-          account: this.account,
-          password: this.password,
-          identity: "admin",
-        },
-      })
-        .then(({ data }) => {
-          if (data.flag) {
-            alert(data.message);
-          } else {
-            alert(data.message);
-          }
-        })
-        .catch((e) => {
-          console.log(e);
-        });
-    },
-  },
-};
+export default {};
 </script>
 
 <style >
