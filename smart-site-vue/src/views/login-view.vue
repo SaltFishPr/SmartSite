@@ -44,6 +44,9 @@ export default {
     console.log(x);
   },
 
+  destroyed() {
+    document.body.removeChild(document.querySelector("#bgCanvas"));
+  },
   data() {
     return {
       account: "",
