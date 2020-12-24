@@ -5,7 +5,7 @@ Vue.use(Router)
 
 const homeView = () => import('../views/home-view.vue')
 const loginView = () => import('../views/login-view.vue')
-const registerView = () => import('../views/register-view.vue')
+
 const contractView = () => import('../views/contract-view.vue')
 const projectView = () => import('../views/project-view.vue')
 const employeeView = () => import('../views/employee-view.vue')
@@ -48,11 +48,7 @@ const routes = [{
 	name: 'loginView',
 	component: loginView,
 	alias: '/'
-}, {
-	path: '/register',
-	name: 'registerView',
-	component: registerView,
-} ,{
+},{
 	path: '/test',
 	name: 'testView',
 	component: testView,
