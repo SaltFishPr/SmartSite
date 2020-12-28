@@ -8,7 +8,7 @@
 """
 import functools
 
-from flask import Blueprint, request, session, json, g
+from flask import Blueprint, request, session, json
 
 import db
 from utils import random_id
@@ -18,9 +18,11 @@ bp = Blueprint("auth", __name__, url_prefix="/auth")  # url_prefix 会添加到�
 
 @bp.route("/register", methods=("POST",))
 def register():
-    account = request.form["account"]
-    password = request.form["password"]
-    identity = request.form["identity"]
+    data = json.loads(request.form["data"])
+    account = data["account"]
+    password = data["password"]
+    identity = data["identity"]
+    print(account, password, identity)
     table = db.UserInfo()
     error = None
 

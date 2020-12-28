@@ -33,7 +33,14 @@ def get_system():
             )
         return res
 
-    data = generate("0")
+    data = [
+        {
+            "systemId": "0",
+            "systemName": "检查体系",
+            "systemDescription": "",
+            "children": generate("0"),
+        }
+    ]
     return {"tree": data}
 
 

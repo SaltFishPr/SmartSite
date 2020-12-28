@@ -399,7 +399,7 @@ class ContractInfo:
                 {
                     "contractId": data[0],
                     "contractDescription": data[1],
-                    "creationTime": data[2],
+                    "createTime": data[2],
                     "clientId": data[3],
                 }
             )
