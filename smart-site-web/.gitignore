@@ -152,4 +152,4 @@ tiles
 
 /Pipfile.lock
 config.py
-checkfiles/*
+static/checkfiles/*

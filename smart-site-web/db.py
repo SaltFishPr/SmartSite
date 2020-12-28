@@ -14,7 +14,7 @@ from utils import id_to_key, key_to_id, random_id, random_employee_id
 
 # decode_responses设置取出为字符串
 pool = redis.ConnectionPool(
-    host=config.redis_host,
+    host=config.back_host,
     port=config.redis_port,
     decode_responses=True,
     password=config.redis_password,
@@ -22,8 +22,7 @@ pool = redis.ConnectionPool(
 
 print(os.getcwd())
 
-checkfiles_path = os.path.join(os.getcwd(), "checkfiles")
-
+checkfiles_path = os.path.join(os.getcwd(), "static/checkfiles")
 
 if not os.path.exists(checkfiles_path):
     os.makedirs(checkfiles_path)
@@ -292,13 +291,14 @@ class ProjectInfo:
         res = []
         for project in projects:
             data = self.get(key_to_id(project))
+
             res.append(
                 {
                     "projectId": data[0],
                     "clientId": data[1],
                     "projectCheckSystemId": data[2],
-                    "projectStatus": data[3],
-                    "projectRiskValue": data[4],
+                    "projectStatus": self.get_proj_status(data),
+                    "projectRiskValue": self.get_proj_risk_value(data),
                     "projectCreationTime": data[5],
                     "projectDescription": data[6],
                     "projectManager": data[7],
@@ -306,6 +306,28 @@ class ProjectInfo:
                 }
             )
         return res
+
+    def get_proj_status(self, data):
+        check_keys = self.__r.keys(pattern=f"CheckInfo:{data[0]}*")
+        table = CheckSystemInfo()
+        check_systems = table.get_children(data[2])
+        if len(check_keys) < len(check_systems):
+            return "未完成"
+        else:
+            return "已完成"
+
+    def get_proj_risk_value(self, data):
+        check_keys = self.__r.keys(pattern=f"CheckInfo:{data[0]}*")
+        print(check_keys)
+        if len(check_keys) == 0:
+            return 0
+        table = CheckInfo()
+        res = 0
+        for check_key in check_keys:
+            check_id = check_key.split(":")[-1]
+            d = table.get(check_id)
+            res += int(d[4])
+        return res / len(check_keys)
 
 
 class ContractInfo:
@@ -428,6 +450,7 @@ class CheckInfo:
         project_id: str,
         check_system_route: str,
         employee_id: str,
+        risk_value: str,
         problem_description: str,
         picture,
     ) -> bool:
@@ -437,6 +460,7 @@ class CheckInfo:
         :param project_id: 项目ID
         :param check_system_route: 检查体系（例：安全检查->人员安全检查）
         :param employee_id: 检查员员工ID
+        :param risk_value: 风险值
         :param problem_description: 问题描述
         :param picture: 序列化后的图片
         :return: 成功返回 True，否则返回 False
@@ -447,6 +471,7 @@ class CheckInfo:
             project_id,
             check_system_route,
             employee_id,
+            risk_value,
             problem_description,
         ]
         picture.save(f"{checkfiles_path}/{check_id}.jpg")
@@ -466,19 +491,11 @@ class CheckInfo:
         """
         获取检查信息
         :param check_id: 检查信息ID
-        :return: [检查信息ID, 项目ID, 检查体系, 用户ID, 问题描述]
+        :return: [检查信息ID, 项目ID, 检查体系, 用户ID, 风险值, 问题描述]
         """
         if not self.is_exist(check_id):
             return []
         return json.loads(self.__r.get(id_to_key(self.__table_name, check_id)))
-
-    def search(self, search_key):
-        check_keys = self.__r.keys(pattern=f"CheckInfo:{search_key}*")
-        res = []
-        for check_key in check_keys:
-            tmp = self.get(check_key)
-            res.append(tmp)
-        return res
 
 
 class CheckSystemInfo:

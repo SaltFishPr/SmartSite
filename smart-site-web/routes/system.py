@@ -3,7 +3,7 @@
 # @file: system.py
 # @date: 2020/12/21
 import json
-from typing import List
+
 from flask import Blueprint, request
 
 import db

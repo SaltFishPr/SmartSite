@@ -6,6 +6,7 @@ import json
 
 from flask import Blueprint, request
 
+import config
 import db
 from utils import page_size_convert
 
@@ -114,7 +115,7 @@ def get_check_info():
             checks.append(
                 {
                     "title": system["system_name"],
-                    "pic": f"{db.checkfiles_path}/{check_id}.jpg",
+                    "pic": f"http://{config.back_host}:{config.back_port}/static/checkfiles/{check_id}.jpg",
                     "employeeName": employee_name,
                     "description": description,
                 }
