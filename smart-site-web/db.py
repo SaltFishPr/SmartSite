@@ -323,8 +323,7 @@ class ProjectInfo:
         table = CheckInfo()
         res = 0
         for check_key in check_keys:
-            check_id = check_key.split(":")[-1]
-            d = table.get(check_id)
+            d = table.get(key_to_id(check_key))
             res += int(d[4])
         return res / len(check_keys)
 
@@ -698,16 +697,15 @@ class EmployeeInfo:
         """
         employee_keys = self.__r.keys(pattern="EmployeeInfo:*")
         res = []
-        table = EmployeeInfo()
         for employee_key in employee_keys:
-            tmp_data = table.get_data(key_to_id(employee_key))
+            tmp_data = self.get_data(key_to_id(employee_key))
             res.append(
                 {
                     "employeeId": tmp_data[0],
                     "employeeName": tmp_data[1],
                     "employeeAge": tmp_data[2],
                     "employeeGroups": ",".join(
-                        table.get_groups(key_to_id(employee_key))
+                        map(str, self.get_groups(key_to_id(employee_key)))
                     ),
                 }
             )
