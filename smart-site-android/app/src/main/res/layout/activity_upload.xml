@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context=".UploadActivity"
+            android:orientation="vertical">
+                <TextView
+                    android:id="@+id/tvUserId"
+                    android:text="用户名"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:gravity="center"></TextView>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:background="#000"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:orientation="horizontal">
+                        <TextView
+                            android:gravity="center"
+                            android:layout_width="200px"
+                            android:layout_height="match_parent"
+                            android:text="检查小组" />
+                        <Spinner
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:id="@+id/spinnerGroupName">
+                        </Spinner>
+
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:orientation="horizontal">
+                        <TextView
+                            android:gravity="center"
+                            android:layout_width="200px"
+                            android:layout_height="match_parent"
+                            android:text="具体项目" />
+                        <Spinner
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:id="@+id/spinnerProjectName">
+                        </Spinner>
+                </LinearLayout>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:background="#000"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="30dp"
+                            android:text="检查体系"
+                            android:layout_gravity="center"></TextView>
+                        <!--        <&#45;&#45;三个下拉框，一级一级的进行下拉所以完成检查体系   >-->
+                       <TextView
+                           android:id="@+id/firstRouteCheck"
+                           android:text="第一级检查体系(选择项目后获取)"
+                           android:layout_width="match_parent"
+                           android:layout_height="60dp"
+                           android:gravity="center"
+                           ></TextView>
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="60dp"
+                            android:orientation="horizontal">
+                                <TextView
+                                    android:gravity="center"
+                                    android:layout_width="200px"
+                                    android:layout_height="match_parent"
+                                    android:text="二级条目" />
+                                <Spinner
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:id="@+id/spinnerRouteTwo">
+                                </Spinner>
+                        </LinearLayout>
+                        <RadioGroup
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:id="@+id/radio_group"
+                            >
+                                <RadioButton
+                                    android:layout_width="0dp"
+                                    android:layout_weight="1"
+                                    android:layout_height="wrap_content"
+                                    android:id="@+id/safe"
+                                    android:text="安全"></RadioButton>
+                                <RadioButton
+                                    android:layout_width="0dp"
+                                    android:layout_weight="1"
+                                    android:layout_height="wrap_content"
+                                    android:id="@+id/dangerous"
+                                    android:text="高危"></RadioButton>
+                                <RadioButton
+                                    android:layout_width="0dp"
+                                    android:layout_weight="1"
+                                    android:id="@+id/low_risk"
+                                    android:layout_height="wrap_content"
+                                    android:text="低风险"></RadioButton>
+                        </RadioGroup>
+                </LinearLayout>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:background="#000"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="请点击上传图片按钮"
+                    android:gravity="center"/>
+                <ImageView android:id="@+id/imageView"
+                    android:adjustViewBounds="true"
+                    android:layout_gravity="center"
+                    android:minWidth="150dip"
+                    android:minHeight="150dip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+                <Button android:id="@+id/btn_select"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:text="选择图片并上传" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="输入相应问题描述"
+                            android:gravity="center"/>
+                        <EditText
+                            android:id="@+id/et_description"
+                            android:layout_width="match_parent"
+                            android:layout_height="160dp"></EditText>
+                </LinearLayout>
+                <Button
+                    android:id="@+id/btn_submit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="提交信息"></Button>
+        </LinearLayout>
+
+
+</ScrollView>
+
+
+
