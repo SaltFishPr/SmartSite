@@ -15,7 +15,6 @@ def get_check_info():
     problem_description = request.form["problem_description"]
     project_id = request.form["project_id"]
     risk_value = request.form["risk_value"]
-    print(risk_value)
     employee_id = request.form["employee_id"]
     check_system_route = request.form["check_system_route"]
     check_id = f"{project_id}-{check_system_route}"

@@ -22,7 +22,6 @@ def register():
     account = data["account"]
     password = data["password"]
     identity = data["identity"]
-    print(account, password, identity)
     table = db.UserInfo()
     error = None
 

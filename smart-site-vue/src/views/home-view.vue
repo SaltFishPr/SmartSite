@@ -1,7 +1,7 @@
 <template>
     <div>
         <el-row class="header">
-            <el-col :span="16">
+            <el-col :span="18">
                 <el-row type="flex" justify="start">
                     <div class="title">智能工地管理系统</div>
                     <el-menu
@@ -43,7 +43,7 @@
                     </el-menu>
                 </el-row>
             </el-col>
-            <el-col :span="6" class="search">
+            <el-col :span="4" class="search">
                 <el-input type="text" placeholder="请输入内容" v-model="searchInput">
                     <el-button slot="append" icon="el-icon-search" @click="searchEvent" title="搜索"></el-button>
                     <el-button slot="append" icon="el-icon-refresh-left" @click="searchReset" title="重置"></el-button>

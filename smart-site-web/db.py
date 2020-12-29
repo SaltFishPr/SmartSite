@@ -318,7 +318,6 @@ class ProjectInfo:
 
     def get_proj_risk_value(self, data):
         check_keys = self.__r.keys(pattern=f"CheckInfo:{data[0]}*")
-        print(check_keys)
         if len(check_keys) == 0:
             return 0
         table = CheckInfo()
@@ -805,7 +804,7 @@ class GroupInfo:
         for k, v in data.items():
             if k == "leader_num":
                 continue
-            res.append([int(k), json.loads(v)["is_leader"]])
+            res.append([k, json.loads(v)["is_leader"]])
         return res
 
     def update_leader_num(self, a: int):
@@ -881,9 +880,9 @@ def get_all_groups():
         group_leader = []
         for tmp_group in tmp.get_all():
             if tmp_group[1] is True:
-                group_leader.append(str(tmp_group[0]))
+                group_leader.append(tmp_group[0])
             else:
-                group_member.append(str(tmp_group[0]))
+                group_member.append(tmp_group[0])
         res.append(
             {
                 "groupId": group_id,
