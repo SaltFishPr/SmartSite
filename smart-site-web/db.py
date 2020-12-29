@@ -14,7 +14,7 @@ from utils import id_to_key, key_to_id, random_id, random_employee_id
 
 # decode_responses设置取出为字符串
 pool = redis.ConnectionPool(
-    host=config.back_host,
+    host=config.redis_host,
     port=config.redis_port,
     decode_responses=True,
     password=config.redis_password,
