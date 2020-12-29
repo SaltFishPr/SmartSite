@@ -3,7 +3,7 @@ import store from '../store'
 
 const service = axios.create({
     method: "post",
-    baseURL: "http://10.138.94.230:8000/",
+    baseURL: "http://118.178.186.105:8000/",
     timeout: 10000,
     transformRequest: data => {
         let transData = new URLSearchParams(); //django接收的数据应该为URLSearchParams对象
