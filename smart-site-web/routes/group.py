@@ -22,6 +22,8 @@ def create_group():
             data["message"] = "theGroupAlreadyExists"
             return json.dumps(data)
 
+        print(rev_data)
+
         employee_string: str = rev_data["groupMember"]
         employee_list = employee_string.split("-")
         for employee in employee_list:

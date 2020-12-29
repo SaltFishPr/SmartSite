@@ -74,14 +74,14 @@
                             ></vxe-input>
                         </template>
                     </vxe-form-item>
-                    <vxe-form-item title="小组组长" field="groupMember" span="24">
+                    <vxe-form-item title="小组成员" field="groupMember" span="24">
                         <template v-slot>
-                            <vxe-input v-model="group.groupMember" placeholder="请输入小组组长" clearable></vxe-input>
+                            <vxe-input v-model="group.groupMember" placeholder="请输入小组成员" clearable></vxe-input>
                         </template>
                     </vxe-form-item>
-                    <vxe-form-item title="小组成员" field="groupLeader" span="24">
+                    <vxe-form-item title="小组组长" field="groupLeader" span="24">
                         <template v-slot>
-                            <vxe-input v-model="group.groupLeader" placeholder="请输入小组成员" clearable></vxe-input>
+                            <vxe-input v-model="group.groupLeader" placeholder="请输入小组组长" clearable></vxe-input>
                         </template>
                     </vxe-form-item>
 
