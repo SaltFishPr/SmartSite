@@ -91,7 +91,7 @@
               'JumpNumber',
               'NextPage',
               'FullJump',
-              'Size',
+              'Sizes',
               'Total',
             ]"
             @page-change="handlePageChange"
