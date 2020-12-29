@@ -705,7 +705,7 @@ class EmployeeInfo:
                     "employeeName": tmp_data[1],
                     "employeeAge": tmp_data[2],
                     "employeeGroups": ",".join(
-                        self.get_groups(key_to_id(employee_key))
+                        map(str, self.get_groups(key_to_id(employee_key)))
                     ),
                 }
             )
